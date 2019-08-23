@@ -22,7 +22,7 @@ public class Run {
     private static final int CURRENT_WEEK = 2;
     private static final int WEEKS_TO_EVALUATE = 5;
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         Run run = new Run();
 
         // Get a list of currently selected players
@@ -34,11 +34,12 @@ public class Run {
         List<Footballer> footballers = new ArrayList<>();
         for (int i = 0; i < picksArray.length(); i++) {
             Pick pick = picksAdapter.fromJson((picksArray.get(i)).toString());
-            Footballer footballer = new Footballer();
-            footballer.setId(pick.element);
-            footballer.setPosition(pick.position);
-            footballers.add(footballer);
-            System.out.println(pick.element);
+            if (pick != null) {
+                Footballer footballer = new Footballer();
+                footballer.setId(pick.element);
+                footballer.setPosition(pick.position);
+                footballers.add(footballer);
+            }
         }
 
         // For the selected player ids get the footballer name and team id
@@ -49,7 +50,7 @@ public class Run {
         for (int j = 0; j < elementsArray.length(); j++) {
             Element element = elementsAdapter.fromJson((elementsArray.get(j)).toString());
             for (Footballer footballer : footballers) {
-                if (element.id == footballer.getId()) {
+                if (element != null && element.id == footballer.getId()) {
                     footballer.setTeamId(element.team);
                     footballer.setWebName(element.web_name);
                 }
@@ -62,7 +63,7 @@ public class Run {
         for (int i = 0; i < teamsArray.length(); i++) {
             Team team = teamsAdapter.fromJson(teamsArray.get(i).toString());
             for (Footballer footballer : footballers) {
-                if (team.id == footballer.getTeamId()) {
+                if (team != null && team.id == footballer.getTeamId()) {
                     footballer.setTeamName(team.short_name);
                 }
             }
@@ -129,9 +130,9 @@ public class Run {
             }
         }
 
-        for (Footballer footballer: footballers) {
+        for (Footballer footballer : footballers) {
             System.out.println("Player: " + footballer.getWebName() + " | Opposition: " + footballer.getOppositionList().toString()
-            + "| Total: " + footballer.getDifficultyTotal());
+                    + "| Total: " + footballer.getDifficultyTotal());
         }
 
     }
