@@ -70,27 +70,55 @@ public class Run {
 
         //  Get the fixtures for each
         for (int weekCounter = 1; weekCounter < WEEKS_TO_EVALUATE; weekCounter++) {
-
-
             JSONArray fixturesArray = new JSONArray(IOUtils.toString(
                     new URL(JsonUrl.FIXTURES.url + (CURRENT_WEEK + weekCounter)), Charset.forName("UTF-8")));
             JsonAdapter<Fixture> fixturesAdapter = moshi.adapter(Fixture.class);
             for (int i = 0; i < fixturesArray.length(); i++) {
                 Fixture fixture = fixturesAdapter.fromJson(fixturesArray.get(i).toString());
                 for (Footballer footballer : footballers) {
-                    if (fixture.team_a == footballer.getTeamId()) {
+
+                    assert fixture != null;
+                    boolean isFootballerPartOfAwayTeam = (fixture.team_a == footballer.getTeamId());
+                    boolean isFootballerPartOfHomeTeam = (fixture.team_h == footballer.getTeamId());
+
+                    if (isFootballerPartOfAwayTeam) {
+                        int oppositionId = fixture.team_h;
                         Opposition opposition = new Opposition();
-                        opposition.setTeamId(fixture.team_h);
-                        opposition.setDifficultyRating(fixture.team_h_difficulty);
+                        opposition.setTeamId(oppositionId);
+                        opposition.setDifficultyRating(fixture.team_a_difficulty);
+
+                        //  Translate the team id to text
+                        for (int j = 0; j < teamsArray.length(); j++) {
+                            Team team = teamsAdapter.fromJson(teamsArray.get(j).toString());
+                            if (team != null && team.id == oppositionId) {
+                                opposition.setName(team.name);
+                                break;
+                            }
+                        }
+
                         List<Opposition> oppositionList = footballer.getOppositionList();
                         oppositionList.add(opposition);
                         footballer.setOppositionList(oppositionList);
                         int currentDifficultyScore = footballer.getDifficultyTotal();
                         footballer.setDifficultyTotal(currentDifficultyScore + opposition.getDifficultyRating());
-                    } else if (fixture.team_h == footballer.getTeamId()) {
+
+
+                    } else if (isFootballerPartOfHomeTeam) {
+                        System.out.println("is in Home team");
+                        int oppositionId = fixture.team_a;
                         Opposition opposition = new Opposition();
-                        opposition.setTeamId(fixture.team_a);
-                        opposition.setDifficultyRating(fixture.team_a_difficulty);
+                        opposition.setTeamId(oppositionId);
+                        opposition.setDifficultyRating(fixture.team_h_difficulty);
+                        System.out.println("difficulty rating: " + fixture.team_a_difficulty);
+
+                        //  Translate the team id to text
+                        for (int j = 0; j < teamsArray.length(); j++) {
+                            Team team = teamsAdapter.fromJson(teamsArray.get(j).toString());
+                            if (team != null && team.id == oppositionId) {
+                                opposition.setName(team.name);
+                            }
+                        }
+
                         List<Opposition> oppositionList = footballer.getOppositionList();
                         oppositionList.add(opposition);
                         footballer.setOppositionList(oppositionList);
@@ -98,7 +126,6 @@ public class Run {
                         footballer.setDifficultyTotal(currentDifficultyScore + opposition.getDifficultyRating());
                     }
                 }
-
             }
         }
 
@@ -109,7 +136,7 @@ public class Run {
 
     }
 
-    public JSONObject getJsonObject(String url) throws IOException {
+    private JSONObject getJsonObject(String url) throws IOException {
         return new JSONObject(IOUtils.toString(new URL(url), Charset.forName("UTF-8")));
     }
 }

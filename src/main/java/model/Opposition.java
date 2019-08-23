@@ -1,9 +1,11 @@
 package model;
 
+@SuppressWarnings("WeakerAccess")
 public class Opposition {
 
     private int teamId;
     private int difficultyRating;
+    private String name;
 
     public int getTeamId() {
         return teamId;
@@ -21,9 +23,17 @@ public class Opposition {
         this.difficultyRating = difficultyRating;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
-        return "team: " + teamId + " | difficulty: " + difficultyRating;
+        return "team: " + name + " | difficulty: " + difficultyRating;
 
     }
 }
