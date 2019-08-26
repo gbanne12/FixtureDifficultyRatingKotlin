@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Run {
@@ -28,6 +29,8 @@ public class Run {
         run.setFootballerNameAndTeamId(footballers);
         run.setTeamName(footballers);
         run.setFixtureDifficultyRating(footballers);
+        Collections.sort(footballers);
+        Collections.reverse(footballers);
 
         for (Footballer footballer : footballers) {
             System.out.println("Player: " + footballer.getWebName() +

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class Footballer {
+public class Footballer implements Comparable<Footballer> {
 
     private int id;
     private int teamId;
@@ -69,5 +69,10 @@ public class Footballer {
 
     public void setOppositionList(List<Opposition> oppositionList) {
         this.oppositionList = oppositionList;
+    }
+
+    @Override
+    public int compareTo(Footballer footballer) {
+        return Integer.compare(difficultyTotal, footballer.difficultyTotal);
     }
 }
