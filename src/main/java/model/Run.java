@@ -20,11 +20,14 @@ import java.util.List;
 
 public class Run {
 
-    private static final int CURRENT_WEEK = 2;
+    private static final int CURRENT_WEEK = 4;
     private static final int WEEKS_TO_EVALUATE = 5;
+    private static List<Team> teamList;
+
 
     public static void main(String[] args) throws IOException {
         Run run = new Run();
+        teamList = run.getTeamList();
         List<Footballer> footballers = run.getFootballersInSquad();
         run.setFootballerNameAndTeamId(footballers);
         run.setTeamName(footballers);
@@ -95,49 +98,40 @@ public class Run {
     }
 
     private void setFixtureDifficultyRating(List<Footballer> footballers) throws IOException {
-        //  Get the fixtures for each
-        for (int weekCounter = 1; weekCounter < WEEKS_TO_EVALUATE; weekCounter++) {
-            JSONArray fixturesArray = new JSONArray(IOUtils.toString(
-                    new URL(JsonUrl.FIXTURES.url + (CURRENT_WEEK + weekCounter)), Charset.forName("UTF-8")));
-            Moshi moshi = new Moshi.Builder().build();
-            JsonAdapter<Fixture> fixturesAdapter = moshi.adapter(Fixture.class);
-
-            for (int i = 0; i < fixturesArray.length(); i++) {
-                Fixture fixture = fixturesAdapter.fromJson(fixturesArray.get(i).toString());
-                for (Footballer footballer : footballers) {
-                    assert fixture != null;
-                    boolean isFootballerPartOfAwayTeam = (fixture.team_a == footballer.getTeamId());
-                    boolean isFootballerPartOfHomeTeam = (fixture.team_h == footballer.getTeamId());
-
-                    if (isFootballerPartOfAwayTeam) {
+        for (int i = 0; i < WEEKS_TO_EVALUATE; i++) {
+            List<Fixture> fixtures = getFixtureList((CURRENT_WEEK + i));
+            for (Footballer footballer : footballers) {
+                for (Fixture fixture : fixtures) {
+                    if (footballer.getTeamId() == fixture.team_a) {
                         setOppositionNameAndDifficulty(footballer, fixture, false);
-                    } else if (isFootballerPartOfHomeTeam) {
+                        break;
+                    } else if (footballer.getTeamId() == fixture.team_h) {
                         setOppositionNameAndDifficulty(footballer, fixture, true);
+                        break;
                     }
                 }
             }
         }
     }
 
-    private void setOppositionNameAndDifficulty(Footballer footballer, Fixture fixture, boolean isFootballerAtHome) throws IOException {
+
+    private void setOppositionNameAndDifficulty(Footballer footballer, Fixture fixture, boolean isFootballerAtHome) {
         Opposition opposition = new Opposition();
         if (isFootballerAtHome) {
             opposition.setTeamId(fixture.team_a);
             opposition.setDifficultyRating(fixture.team_h_difficulty);
+            for (Team team : teamList) {
+                if (fixture.team_a == team.id) {
+                    opposition.setName(team.short_name);
+                }
+            }
         } else {
             opposition.setTeamId(fixture.team_h);
             opposition.setDifficultyRating(fixture.team_a_difficulty);
-        }
-
-        //  Translate the team id to text
-        JSONObject elementsJson = getJsonObject(JsonUrl.STATIC.url);
-        JSONArray teamsArray = elementsJson.getJSONArray("teams");
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Team> teamsAdapter = moshi.adapter(Team.class);
-        for (int j = 0; j < teamsArray.length(); j++) {
-            Team team = teamsAdapter.fromJson(teamsArray.get(j).toString());
-            if (team != null && team.id == opposition.getTeamId()) {
-                opposition.setName(team.name);
+            for (Team team : teamList) {
+                if (fixture.team_a == team.id) {
+                    opposition.setName(team.short_name);
+                }
             }
         }
 
@@ -148,4 +142,31 @@ public class Run {
         footballer.setDifficultyTotal(currentDifficultyScore + opposition.getDifficultyRating());
     }
 
+
+    private List<Fixture> getFixtureList(int gameweek) throws IOException {
+        URL fixturesEndpoint = new URL(JsonUrl.FIXTURES.url + (gameweek));
+        JSONArray fixturesArray = new JSONArray(IOUtils.toString(fixturesEndpoint, Charset.forName("UTF-8")));
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<Fixture> fixturesAdapter = moshi.adapter(Fixture.class);
+
+        List<Fixture> fixtures = new ArrayList<>();
+        for (int i = 0; i < fixturesArray.length(); i++) {
+            Fixture fixture = fixturesAdapter.fromJson(fixturesArray.get(i).toString());
+            fixtures.add(fixture);
+        }
+
+        return fixtures;
+    }
+
+    private List<Team> getTeamList() throws IOException {
+        JSONObject elementsJson = getJsonObject(JsonUrl.STATIC.url);
+        JSONArray teamsArray = elementsJson.getJSONArray("teams");
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<Team> teamsAdapter = moshi.adapter(Team.class);
+        List<Team> teamList = new ArrayList<>();
+        for (int j = 0; j < teamsArray.length(); j++) {
+            teamList.add(teamsAdapter.fromJson(teamsArray.get(j).toString()));
+        }
+        return teamList;
+    }
 }
