@@ -28,7 +28,7 @@ public class Run {
     public static void main(String[] args) throws IOException {
         Run run = new Run();
         teamList = run.getTeamList();
-        List<Footballer> footballers = run.getFootballersInSquad();
+        List<Footballer> footballers = run.getFootballerList();
         run.setFootballerNameAndTeamId(footballers);
         run.setTeamName(footballers);
         run.setFixtureDifficultyRating(footballers);
@@ -46,7 +46,7 @@ public class Run {
         return new JSONObject(IOUtils.toString(new URL(url), Charset.forName("UTF-8")));
     }
 
-    private List<Footballer> getFootballersInSquad() throws IOException {
+    private List<Footballer> getFootballerList() throws IOException {
         JSONObject picksJson = getJsonObject(JsonUrl.PICKS_PREFIX.url + CURRENT_WEEK + JsonUrl.PICKS_SUFFIX.url);
         JSONArray picksArray = picksJson.getJSONArray("picks");
         Moshi moshi = new Moshi.Builder().build();
@@ -82,14 +82,9 @@ public class Run {
         }
     }
 
-    private void setTeamName(List<Footballer> footballers) throws IOException {
-        JSONObject elementsJson = getJsonObject(JsonUrl.STATIC.url);
-        JSONArray teamsArray = elementsJson.getJSONArray("teams");
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Team> teamsAdapter = moshi.adapter(Team.class);
-        for (int i = 0; i < teamsArray.length(); i++) {
-            Team team = teamsAdapter.fromJson(teamsArray.get(i).toString());
-            for (Footballer footballer : footballers) {
+    private void setTeamName(List<Footballer> footballers) {
+        for (Footballer footballer : footballers) {
+            for (Team team : teamList) {
                 if (team != null && team.id == footballer.getTeamId()) {
                     footballer.setTeamName(team.short_name);
                 }
