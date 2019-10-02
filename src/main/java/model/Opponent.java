@@ -1,7 +1,7 @@
 package model;
 
 @SuppressWarnings("WeakerAccess")
-public class Opposition {
+public class Opponent {
 
     private int teamId;
     private int difficultyRating;
@@ -34,6 +34,5 @@ public class Opposition {
     @Override
     public String toString() {
         return "team: " + name + " | difficulty: " + difficultyRating;
-
     }
 }

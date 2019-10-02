@@ -1,6 +1,6 @@
 package url;
 
-public enum JsonUrl {
+public enum FantasyEndpoint {
 
     PICKS_PREFIX("https://fantasy.premierleague.com/api/entry/2029893/event/"),
     PICKS_SUFFIX("/picks/"),
@@ -9,9 +9,7 @@ public enum JsonUrl {
 
     public final String url;
 
-    JsonUrl(String url) {
+    FantasyEndpoint(String url) {
         this.url = url;
     }
-
-
 }

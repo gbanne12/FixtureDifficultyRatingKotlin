@@ -11,7 +11,7 @@ public class Footballer implements Comparable<Footballer> {
     private int position;
     private String webName;
     private String teamName;
-    private List<Opposition> oppositionList = new ArrayList<>();
+    private List<Opponent> opponentList = new ArrayList<>();
     private int difficultyTotal = 0;
 
 
@@ -63,12 +63,12 @@ public class Footballer implements Comparable<Footballer> {
         this.teamName = teamName;
     }
 
-    public List<Opposition> getOppositionList() {
-        return oppositionList;
+    public List<Opponent> getOpponentList() {
+        return opponentList;
     }
 
-    public void setOppositionList(List<Opposition> oppositionList) {
-        this.oppositionList = oppositionList;
+    public void setOpponentList(List<Opponent> opponentList) {
+        this.opponentList = opponentList;
     }
 
     @Override
