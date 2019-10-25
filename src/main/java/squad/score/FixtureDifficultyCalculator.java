@@ -37,10 +37,11 @@ public class FixtureDifficultyCalculator {
 
             for (Footballer footballer : footballers) {
                 for (Fixture fixture : fixtures) {
-                    if (footballer.getTeamId() == fixture.team_a) {
+                    int teamId = footballer.getTeamId();
+                    if (teamId == fixture.team_a) {
                         setOppositionNameAndDifficulty(footballer, fixture, false);
                         break;
-                    } else if (footballer.getTeamId() == fixture.team_h) {
+                    } else if (teamId == fixture.team_h) {
                         setOppositionNameAndDifficulty(footballer, fixture, true);
                         break;
                     }
@@ -51,23 +52,29 @@ public class FixtureDifficultyCalculator {
     }
 
     private void setOppositionNameAndDifficulty(Footballer footballer, Fixture fixture, boolean isFootballerAtHome) {
+        int awayTeam = fixture.team_a;
+        int homeTeam = fixture.team_h;
+        int difficultyForHomeTeam = fixture.team_h_difficulty;
+        int difficultyForAwayTeam = fixture.team_a_difficulty;
+
         Opponent opponent = new Opponent();
         if (isFootballerAtHome) {
-            opponent.setTeamId(fixture.team_a);
-            opponent.setDifficultyRating(fixture.team_h_difficulty);
+            opponent.setTeamId(awayTeam);
             for (Team team : teamList) {
-                if (fixture.team_a == team.id) {
+                if (awayTeam == team.id) {
                     opponent.setName(team.short_name);
                 }
             }
+            opponent.setDifficultyRating(difficultyForHomeTeam);
+
         } else {
-            opponent.setTeamId(fixture.team_h);
-            opponent.setDifficultyRating(fixture.team_a_difficulty);
+            opponent.setTeamId(homeTeam);
             for (Team team : teamList) {
-                if (fixture.team_a == team.id) {
+                if (homeTeam == team.id) {
                     opponent.setName(team.short_name);
                 }
             }
+            opponent.setDifficultyRating(difficultyForAwayTeam);
         }
 
         List<Opponent> opponentList = footballer.getOpponentList();

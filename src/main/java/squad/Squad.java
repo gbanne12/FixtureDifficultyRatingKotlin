@@ -57,7 +57,7 @@ public class Squad {
         return footballers;
     }
 
-    public void populateFootballerDetails(JSONArray elements) throws IOException {
+    private void populateFootballerDetails(JSONArray elements) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<Element> elementsAdapter = moshi.adapter(Element.class);
 
