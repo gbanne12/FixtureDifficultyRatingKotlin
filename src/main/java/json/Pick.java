@@ -1,4 +1,4 @@
-package model.json;
+package json;
 
 public class Pick {
     public final int element;

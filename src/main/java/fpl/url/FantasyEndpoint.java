@@ -1,4 +1,4 @@
-package url;
+package fpl.url;
 
 public enum FantasyEndpoint {
 

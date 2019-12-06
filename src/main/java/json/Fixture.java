@@ -1,4 +1,4 @@
-package model.json;
+package json;
 
 public class Fixture {
     public int team_a;

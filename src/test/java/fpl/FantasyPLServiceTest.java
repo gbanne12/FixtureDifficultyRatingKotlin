@@ -1,4 +1,4 @@
-package service.fpl;
+package fpl;
 
 import org.json.JSONArray;
 import org.junit.Test;

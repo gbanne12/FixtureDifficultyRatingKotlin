@@ -1,13 +1,13 @@
-package squad;
+package fpl.teams.fantasy;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import model.Footballer;
-import model.json.Element;
-import model.json.Pick;
-import model.json.Team;
+import json.Element;
+import json.Pick;
+import json.Team;
 import org.json.JSONArray;
-import service.fpl.FantasyPLService;
+import fpl.FantasyPLService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Squad {
 
-    private List<Footballer> footballers = new ArrayList<>();
+    private List<Footballer> footballerList = new ArrayList<>();
     private List<Team> teamList;
 
     public Squad() throws IOException {
@@ -30,14 +30,20 @@ public class Squad {
         }
     }
 
-    public List<Footballer> get(int gameWeek) throws IOException {
+    /**
+     * Get a list containing the manager's squad selection for a given week
+     * The first 11 items in the list are the chosen team with the last 4 items being the substitutes
+     * @param week the game week the squad was selected for
+     * @return a list of 15 footballerList that make up the squad
+     * @throws IOException
+     */
+    public List<Footballer> get(int week) throws IOException {
         FantasyPLService fplService = new FantasyPLService();
-        JSONArray picks = fplService.getPicksArray(gameWeek);
-        footballers = getFootballersFromArray(picks);
-
+        JSONArray picks = fplService.getPicksArray(week);
+        footballerList = getFootballersFromArray(picks);
         JSONArray elements = fplService.getElementsArray();
         populateFootballerDetails(elements);
-        return footballers;
+        return footballerList;
     }
 
     private List<Footballer> getFootballersFromArray(JSONArray picks) throws IOException {
@@ -64,7 +70,7 @@ public class Squad {
         // add team id and footballer name
         for (int j = 0; j < elements.length(); j++) {
             Element element = elementsAdapter.fromJson((elements.get(j)).toString());
-            for (Footballer footballer : footballers) {
+            for (Footballer footballer : footballerList) {
                 if (element != null && element.id == footballer.getId()) {
                     footballer.setTeamId(element.team);
                     footballer.setWebName(element.web_name);
@@ -73,7 +79,7 @@ public class Squad {
         }
 
         // getGamewWeek team list and add team name based on id
-        for (Footballer footballer : footballers) {
+        for (Footballer footballer : footballerList) {
             for (Team team : teamList) {
                 if (team != null && team.id == footballer.getTeamId()) {
                     footballer.setTeamName(team.short_name);

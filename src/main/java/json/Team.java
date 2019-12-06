@@ -1,4 +1,4 @@
-package model.json;
+package json;
 
 public class Team {
     public final int id;

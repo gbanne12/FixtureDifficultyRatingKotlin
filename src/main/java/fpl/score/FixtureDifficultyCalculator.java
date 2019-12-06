@@ -1,13 +1,13 @@
-package squad.score;
+package fpl.score;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import model.Footballer;
 import model.Opponent;
-import model.json.Fixture;
-import model.json.Team;
+import json.Fixture;
+import json.Team;
 import org.json.JSONArray;
-import service.fpl.FantasyPLService;
+import fpl.FantasyPLService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,11 +29,11 @@ public class FixtureDifficultyCalculator {
         }
     }
 
-    public List<Footballer> getDifficulty(List<Footballer> footballers, int gameWeek, int weeksToEvaluate) throws IOException {
+    public List<Footballer> getDifficultyTotal(List<Footballer> footballers, int gameWeek, int weeksToEvaluate) throws IOException {
         for (int i = 0; i < weeksToEvaluate; i++) {
             FantasyPLService fplService = new FantasyPLService();
             JSONArray fixturesArray = fplService.getFixturesArray(gameWeek + i);
-            List<Fixture> fixtures = getFixturesFromArray((fixturesArray));
+            List<Fixture> fixtures = getFixturesFromArray(fixturesArray);
 
             for (Footballer footballer : footballers) {
                 for (Fixture fixture : fixtures) {

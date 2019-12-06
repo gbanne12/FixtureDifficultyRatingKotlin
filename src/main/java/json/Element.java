@@ -1,4 +1,4 @@
-package model.json;
+package json;
 
 public class Element {
 
