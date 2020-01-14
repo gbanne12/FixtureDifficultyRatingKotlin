@@ -11,7 +11,10 @@ import fpl.FantasyPLService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 public class FixtureDifficultyCalculator {
 
@@ -35,19 +38,23 @@ public class FixtureDifficultyCalculator {
             JSONArray fixturesArray = fplService.getFixturesArray(gameWeek + i);
             List<Fixture> fixtures = getFixturesFromArray(fixturesArray);
 
-            for (Footballer footballer : footballers) {
                 for (Fixture fixture : fixtures) {
-                    int teamId = footballer.getTeamId();
-                    if (teamId == fixture.team_a) {
-                        setOppositionNameAndDifficulty(footballer, fixture, false);
-                        break;
-                    } else if (teamId == fixture.team_h) {
-                        setOppositionNameAndDifficulty(footballer, fixture, true);
-                        break;
-                    }
+                    footballers.sort(new SortByTeamId());
+                    Footballer matchingTeamId = new Footballer();
+                    matchingTeamId.setTeamId(fixture.team_h);
+                   int index = Collections.binarySearch(footballers, matchingTeamId, new SortByTeamId());
+                   if (index >= 0) {
+                       setOppositionNameAndDifficulty(footballers.get(index), fixture, true);
+                   }
+
+                    matchingTeamId.setTeamId(fixture.team_a);
+                    int awayIndex = Collections.binarySearch(footballers, matchingTeamId, new SortByTeamId());
+                        if (awayIndex >= 0) {
+                            setOppositionNameAndDifficulty(footballers.get(awayIndex), fixture, false);
+
+                        }
                 }
             }
-        }
         return footballers;
     }
 
@@ -93,5 +100,15 @@ public class FixtureDifficultyCalculator {
             fixtures.add(fixture);
         }
         return fixtures;
+    }
+
+    class SortByTeamId implements Comparator<Footballer>
+    {
+        // Used for sorting in ascending order of
+        // roll name
+        public int compare(Footballer a, Footballer b)
+        {
+            return Integer.compare(a.getTeamId(), b.getTeamId());
+        }
     }
 }
