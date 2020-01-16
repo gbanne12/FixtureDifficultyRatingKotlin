@@ -38,59 +38,40 @@ public class FixtureDifficultyCalculator {
 
             for (Fixture fixture : fixtures) {
                 int homeTeamId = fixture.team_h;
-                Footballer homeFootballer = new Footballer();
-                homeFootballer.setTeamId(homeTeamId);
-                int result = Collections.binarySearch(footballers, homeFootballer, new SortByTeamId());
-                if (result >= 0) {
-                    setOppositionNameAndDifficulty(footballers.get(result), fixture, true);
-                    ListIterator<Footballer> iterator = footballers.listIterator(result);
-                    while (iterator.next().getTeamId() == homeTeamId) {
-                        setOppositionNameAndDifficulty(footballers.get(iterator.nextIndex() - 1), fixture, true);
-                    }
-                }
+                int oppositionRating = fixture.team_a_difficulty;
+                setOppositionNameAndDifficulty(footballers, homeTeamId, oppositionRating);
 
                 int awayTeamId = fixture.team_a;
-                Footballer awayFootballer = new Footballer();
-                awayFootballer.setTeamId(awayTeamId);
-                int awayIndex = Collections.binarySearch(footballers, awayFootballer, new SortByTeamId());
-                if (awayIndex >= 0) {
-                    setOppositionNameAndDifficulty(footballers.get(awayIndex), fixture, false);
-                    ListIterator<Footballer> it = footballers.listIterator(result);
-                    while (it.next().getTeamId() == awayTeamId) {
-                        setOppositionNameAndDifficulty(footballers.get(it.nextIndex() - 1), fixture, false);
-                    }
-                }
+                oppositionRating = fixture.team_h_difficulty;
+                setOppositionNameAndDifficulty(footballers, awayTeamId, oppositionRating);
             }
         }
         return footballers;
     }
 
-    private void setOppositionNameAndDifficulty(Footballer footballer, Fixture fixture, boolean isFootballerAtHome) {
-        int awayTeam = fixture.team_a;
-        int homeTeam = fixture.team_h;
-        int difficultyForHomeTeam = fixture.team_h_difficulty;
-        int difficultyForAwayTeam = fixture.team_a_difficulty;
-
-        Opponent opponent = new Opponent();
-        if (isFootballerAtHome) {
-            opponent.setTeamId(awayTeam);
-            for (Team team : teamList) {
-                if (awayTeam == team.id) {
-                    opponent.setName(team.short_name);
-                }
+    private void setOppositionNameAndDifficulty(List<Footballer> footballers, int teamId, int oppositionRating) {
+        Footballer homeFootballer = new Footballer();
+        homeFootballer.setTeamId(teamId);
+        int result = Collections.binarySearch(footballers, homeFootballer, new SortByTeamId());
+        if (result >= 0) {
+            setOppositionNameAndDifficulty(footballers.get(result), teamId, oppositionRating);
+            ListIterator<Footballer> iterator = footballers.listIterator(result);
+            while (iterator.next().getTeamId() == teamId) {
+                setOppositionNameAndDifficulty(footballers.get(iterator.nextIndex() - 1), teamId, oppositionRating);
             }
-            opponent.setDifficultyRating(difficultyForHomeTeam);
-
-        } else {
-            opponent.setTeamId(homeTeam);
-            for (Team team : teamList) {
-                if (homeTeam == team.id) {
-                    opponent.setName(team.short_name);
-                }
-            }
-            opponent.setDifficultyRating(difficultyForAwayTeam);
         }
+    }
 
+    public void setOppositionNameAndDifficulty(Footballer footballer, int teamId, int oppositionRating) {
+        Opponent opponent = new Opponent();
+        opponent.setTeamId(teamId);
+        for (Team team : teamList) {
+            if (teamId == team.id) {
+                opponent.setName(team.short_name);
+            }
+        }
+        opponent.setDifficultyRating(oppositionRating);
+        
         List<Opponent> opponentList = footballer.getOpponentList();
         opponentList.add(opponent);
         footballer.setOpponentList(opponentList);
