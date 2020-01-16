@@ -2,19 +2,15 @@ package fpl.score;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import model.Footballer;
-import model.Opponent;
+import fpl.FantasyPLService;
 import json.Fixture;
 import json.Team;
+import model.Footballer;
+import model.Opponent;
 import org.json.JSONArray;
-import fpl.FantasyPLService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.ToIntFunction;
+import java.util.*;
 
 public class FixtureDifficultyCalculator {
 
@@ -33,28 +29,39 @@ public class FixtureDifficultyCalculator {
     }
 
     public List<Footballer> getDifficultyTotal(List<Footballer> footballers, int gameWeek, int weeksToEvaluate) throws IOException {
+        footballers.sort(new SortByTeamId());
+
         for (int i = 0; i < weeksToEvaluate; i++) {
             FantasyPLService fplService = new FantasyPLService();
             JSONArray fixturesArray = fplService.getFixturesArray(gameWeek + i);
             List<Fixture> fixtures = getFixturesFromArray(fixturesArray);
 
-                for (Fixture fixture : fixtures) {
-                    footballers.sort(new SortByTeamId());
-                    Footballer matchingTeamId = new Footballer();
-                    matchingTeamId.setTeamId(fixture.team_h);
-                   int index = Collections.binarySearch(footballers, matchingTeamId, new SortByTeamId());
-                   if (index >= 0) {
-                       setOppositionNameAndDifficulty(footballers.get(index), fixture, true);
-                   }
+            for (Fixture fixture : fixtures) {
+                int homeTeamId = fixture.team_h;
+                Footballer homeFootballer = new Footballer();
+                homeFootballer.setTeamId(homeTeamId);
+                int result = Collections.binarySearch(footballers, homeFootballer, new SortByTeamId());
+                if (result >= 0) {
+                    setOppositionNameAndDifficulty(footballers.get(result), fixture, true);
+                    ListIterator<Footballer> iterator = footballers.listIterator(result);
+                    while (iterator.next().getTeamId() == homeTeamId) {
+                        setOppositionNameAndDifficulty(footballers.get(iterator.nextIndex() - 1), fixture, true);
+                    }
+                }
 
-                    matchingTeamId.setTeamId(fixture.team_a);
-                    int awayIndex = Collections.binarySearch(footballers, matchingTeamId, new SortByTeamId());
-                        if (awayIndex >= 0) {
-                            setOppositionNameAndDifficulty(footballers.get(awayIndex), fixture, false);
-
-                        }
+                int awayTeamId = fixture.team_a;
+                Footballer awayFootballer = new Footballer();
+                awayFootballer.setTeamId(awayTeamId);
+                int awayIndex = Collections.binarySearch(footballers, awayFootballer, new SortByTeamId());
+                if (awayIndex >= 0) {
+                    setOppositionNameAndDifficulty(footballers.get(awayIndex), fixture, false);
+                    ListIterator<Footballer> it = footballers.listIterator(result);
+                    while (it.next().getTeamId() == awayTeamId) {
+                        setOppositionNameAndDifficulty(footballers.get(it.nextIndex() - 1), fixture, false);
+                    }
                 }
             }
+        }
         return footballers;
     }
 
@@ -102,12 +109,8 @@ public class FixtureDifficultyCalculator {
         return fixtures;
     }
 
-    class SortByTeamId implements Comparator<Footballer>
-    {
-        // Used for sorting in ascending order of
-        // roll name
-        public int compare(Footballer a, Footballer b)
-        {
+    class SortByTeamId implements Comparator<Footballer> {
+        public int compare(Footballer a, Footballer b) {
             return Integer.compare(a.getTeamId(), b.getTeamId());
         }
     }
