@@ -12,7 +12,7 @@ public class Footballer implements Comparable<Footballer> {
     private String webName;
     private String teamName;
     private List<Opponent> opponentList = new ArrayList<>();
-    private int difficultyTotal = 0;
+    private int difficultyTotal;
 
 
     public int getId() {
@@ -40,6 +40,11 @@ public class Footballer implements Comparable<Footballer> {
     }
 
     public int getDifficultyTotal() {
+        int numberOfOpponnents = opponentList.size();
+        int difficultyTotal = 0;
+        for (int i = 0; i < numberOfOpponnents; i++) {
+            difficultyTotal += opponentList.get(i).getDifficultyRating();
+        }
         return difficultyTotal;
     }
 

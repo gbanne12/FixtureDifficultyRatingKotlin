@@ -28,13 +28,6 @@ public class Run {
         Collections.reverse(footballers);
 
         for (Footballer footballer : footballers) {
-            int difficulty = 0;
-            List<Opponent> opponentList = footballer.getOpponentList();
-            for (Opponent opponent: opponentList) {
-                difficulty += opponent.getDifficultyRating();
-                footballer.setDifficultyTotal(difficulty);
-            }
-            
             System.out.println("Player: " + footballer.getWebName()
                             + "| Opponent: " + footballer.getOpponentList().toString()
                             + "| Total: " + footballer.getDifficultyTotal());
