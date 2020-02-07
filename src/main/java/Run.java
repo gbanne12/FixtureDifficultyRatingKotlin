@@ -2,6 +2,7 @@ import fpl.event.GameWeek;
 import model.Footballer;
 import fpl.teams.fantasy.Squad;
 import fpl.score.FixtureDifficultyCalculator;
+import model.Opponent;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,13 +19,22 @@ public class Run {
         Squad squad = new Squad();
         List<Footballer> footballers = squad.get(week - 1);
 
-        FixtureDifficultyCalculator calculator = new FixtureDifficultyCalculator();
-        footballers = calculator.getDifficultyTotal(footballers, week, WEEKS_TO_EVALUATE);
+        for (int i = 0; i < WEEKS_TO_EVALUATE; i++) {
+            FixtureDifficultyCalculator calculator = new FixtureDifficultyCalculator();
+            footballers = calculator.getDifficultyTotal(footballers, week + i);
+        }
 
         Collections.sort(footballers);
         Collections.reverse(footballers);
 
         for (Footballer footballer : footballers) {
+            int difficulty = 0;
+            List<Opponent> opponentList = footballer.getOpponentList();
+            for (Opponent opponent: opponentList) {
+                difficulty += opponent.getDifficultyRating();
+                footballer.setDifficultyTotal(difficulty);
+            }
+            
             System.out.println("Player: " + footballer.getWebName()
                             + "| Opponent: " + footballer.getOpponentList().toString()
                             + "| Total: " + footballer.getDifficultyTotal());
