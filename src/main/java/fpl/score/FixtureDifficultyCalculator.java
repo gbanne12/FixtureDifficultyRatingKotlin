@@ -16,6 +16,18 @@ import java.util.stream.Collectors;
 public class FixtureDifficultyCalculator {
     private List<Team> teamList;
 
+    public FixtureDifficultyCalculator() throws IOException {
+        FantasyPLService fplService = new FantasyPLService();
+        JSONArray teamsArray = fplService.getTeamsArray();
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<Team> teamsAdapter = moshi.adapter(Team.class);
+        teamList = new ArrayList<>();
+        for (int j = 0; j < teamsArray.length(); j++) {
+            teamList.add(teamsAdapter.fromJson(teamsArray.get(j).toString()));
+        }
+    }
+
+
     public List<Footballer> getDifficultyTotal(List<Footballer> footballers, int gameWeek) throws IOException {
 
             FantasyPLService fplService = new FantasyPLService();
@@ -76,7 +88,6 @@ public class FixtureDifficultyCalculator {
     private List<Opponent> getOpponnentList(Footballer footballer, int opponentId, int oppositionRating) throws IOException {
         Opponent opponent = new Opponent();
         opponent.setTeamId(opponentId);
-        teamList = getTeamList();
         for (Team team : teamList) {
             if (opponentId == team.id) {
                 opponent.setName(team.short_name);

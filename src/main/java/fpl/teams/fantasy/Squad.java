@@ -16,19 +16,6 @@ import java.util.List;
 public class Squad {
 
     private List<Footballer> footballerList = new ArrayList<>();
-    private List<Team> teamList;
-
-    public Squad() throws IOException {
-        // Look up the team array only once
-        FantasyPLService fplService = new FantasyPLService();
-        JSONArray teamsArray = fplService.getTeamsArray();
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Team> teamsAdapter = moshi.adapter(Team.class);
-        teamList = new ArrayList<>();
-        for (int j = 0; j < teamsArray.length(); j++) {
-            teamList.add(teamsAdapter.fromJson(teamsArray.get(j).toString()));
-        }
-    }
 
     /**
      * Get a list containing the manager's squad selection for a given week
@@ -74,15 +61,6 @@ public class Squad {
                 if (element != null && element.id == footballer.getId()) {
                     footballer.setTeamId(element.team);
                     footballer.setWebName(element.web_name);
-                }
-            }
-        }
-
-        // getGamewWeek team list and add team name based on id
-        for (Footballer footballer : footballerList) {
-            for (Team team : teamList) {
-                if (team != null && team.id == footballer.getTeamId()) {
-                    footballer.setTeamName(team.short_name);
                 }
             }
         }
