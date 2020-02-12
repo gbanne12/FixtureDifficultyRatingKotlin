@@ -2,59 +2,58 @@ package fpl.teams.fantasy;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import model.Footballer;
+import fpl.FantasyPLService;
 import json.Element;
 import json.Pick;
-import json.Team;
+import model.Footballer;
 import org.json.JSONArray;
-import fpl.FantasyPLService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Squad {
+public class Selection {
 
-    private List<Footballer> footballerList = new ArrayList<>();
+    private int teamId;
+    private int week;
 
-    /**
-     * Get a list containing the manager's squad selection for a given week
-     * The first 11 items in the list are the chosen team with the last 4 items being the substitutes
-     * @param week the game week the squad was selected for
-     * @return a list of 15 footballerList that make up the squad
-     * @throws IOException
-     */
-    public List<Footballer> get(int week) throws IOException {
-        FantasyPLService fplService = new FantasyPLService();
-        JSONArray picks = fplService.getPicksArray(week);
-        footballerList = getFootballersFromArray(picks);
-        JSONArray elements = fplService.getElementsArray();
-        populateFootballerDetails(elements);
-        return footballerList;
+    public Selection(int teamId, int week) {
+        this.teamId = teamId;
+        this.week = week;
     }
 
-    private List<Footballer> getFootballersFromArray(JSONArray picks) throws IOException {
+    public List<Footballer> get() throws IOException {
+        long startTime = System.currentTimeMillis();
+        JSONArray picks = getPicks(week);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Get Pick time " + (endTime - startTime));
+        return getPopulatedFootballerList(picks);
+    }
+
+    private JSONArray getPicks(int week) throws IOException {
+        FantasyPLService fplService = new FantasyPLService();
+        return fplService.getPicksArray(week);
+    }
+
+    private List<Footballer> getPopulatedFootballerList(JSONArray picks) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<Pick> picksAdapter = moshi.adapter(Pick.class);
 
-        List<Footballer> footballers = new ArrayList<>();
+        List<Footballer> footballerList = new ArrayList<>();
         for (int i = 0; i < picks.length(); i++) {
             Pick pick = picksAdapter.fromJson((picks.get(i)).toString());
             if (pick != null) {
                 Footballer footballer = new Footballer();
                 footballer.setId(pick.element);
                 footballer.setPosition(pick.position);
-                footballers.add(footballer);
+                footballerList.add(footballer);
             }
         }
-        return footballers;
-    }
-
-    private void populateFootballerDetails(JSONArray elements) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Element> elementsAdapter = moshi.adapter(Element.class);
 
         // add team id and footballer name
+        JSONArray elements = new FantasyPLService().getElementsArray();
+        JsonAdapter<Element> elementsAdapter = moshi.adapter(Element.class);
+
         for (int j = 0; j < elements.length(); j++) {
             Element element = elementsAdapter.fromJson((elements.get(j)).toString());
             for (Footballer footballer : footballerList) {
@@ -64,6 +63,7 @@ public class Squad {
                 }
             }
         }
-
+        return footballerList;
     }
+
 }
