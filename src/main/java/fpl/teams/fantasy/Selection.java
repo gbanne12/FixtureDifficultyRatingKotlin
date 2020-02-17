@@ -16,18 +16,18 @@ public class Selection {
 
     private int teamId;
     private int week;
+    private List<Footballer> footballerList;
 
-    public Selection(int teamId, int week) {
-        this.teamId = teamId;
-        this.week = week;
-    }
-
-    public List<Footballer> get() throws IOException {
+    public Selection(int teamId, int week) throws IOException {
         long startTime = System.currentTimeMillis();
         JSONArray picks = getPicks(week);
         long endTime = System.currentTimeMillis();
         System.out.println("Get Pick time " + (endTime - startTime));
-        return getPopulatedFootballerList(picks);
+        footballerList = getPopulatedFootballerList(picks);
+    }
+
+    public List<Footballer> get() {
+        return footballerList;
     }
 
     private JSONArray getPicks(int week) throws IOException {

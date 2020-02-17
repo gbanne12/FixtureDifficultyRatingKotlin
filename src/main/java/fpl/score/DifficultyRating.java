@@ -5,6 +5,7 @@ import com.squareup.moshi.Moshi;
 import data.model.Fixture;
 import data.model.Team;
 import fpl.FantasyPLService;
+import fpl.teams.fantasy.Selection;
 import model.Footballer;
 import model.Opponent;
 import org.json.JSONArray;
@@ -29,7 +30,16 @@ public class DifficultyRating {
         }
     }
 
-    public List<Footballer> getOpponentDifficulty(List<Footballer> footballers, int gameWeek) throws IOException {
+    public List<Footballer> getOpponentDifficulty(Selection selection, int gameWeek, int weeksToCalculate) throws IOException{
+        List<Footballer> footballers = selection.get();
+        for(int i = 0; i < weeksToCalculate; i++) {
+            footballers = getOpponentDifficulty(selection, gameWeek + i);
+        }
+        return footballers;
+    }
+
+    public List<Footballer> getOpponentDifficulty(Selection selection, int gameWeek) throws IOException {
+        List<Footballer> footballers = selection.get();
         FantasyPLService fplService = new FantasyPLService();
         JSONArray fixturesArray = fplService.getFixturesArray(gameWeek);
         List<Fixture> fixtures = getFixturesList(fixturesArray);
@@ -40,6 +50,7 @@ public class DifficultyRating {
             int homeTeamFixtureDifficulty = fixture.team_h_difficulty;
             int awayTeamId = fixture.team_a;
             int awayTeamFixtureDifficulty = fixture.team_a_difficulty;
+
 
             List<Footballer> homeFootballers = filterFootballersByTeamId(footballers, homeTeamId);
             for (Footballer footballer : homeFootballers) {

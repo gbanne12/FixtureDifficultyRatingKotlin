@@ -13,24 +13,19 @@ public class Run {
 
     public static void main(String[] args) throws IOException {
         long startT = System.currentTimeMillis();
+
         int week = new StaticRepository().getCurrentWeek();
         Selection selection = new Selection(454545, week);
-        List<Footballer> footballers = selection.get();
+        DifficultyRating calculator = new DifficultyRating();
+        List<Footballer> footballerList = calculator.getOpponentDifficulty(selection, week + 1, WEEKS_TO_EVALUATE);
 
-        for (int i = 0; i < WEEKS_TO_EVALUATE; i++) {
-            System.out.println("Week " + i);
-            DifficultyRating calculator = new DifficultyRating();
-            footballers = calculator.getOpponentDifficulty(footballers, week + i);
-        }
-
-        Collections.sort(footballers);
-        Collections.reverse(footballers);
-
-        for (Footballer footballer : footballers) {
+        Collections.reverse(footballerList);
+        for (Footballer footballer : footballerList) {
             System.out.println("Player: " + footballer.getWebName()
-                            + "| Opponent: " + footballer.getOpponentList().toString()
-                            + "| Total: " + footballer.getDifficultyTotal());
+                    + "| Opponent: " + footballer.getOpponentList().toString()
+                    + "| Total: " + footballer.getDifficultyTotal());
         }
+
         long endT = System.currentTimeMillis();
         System.out.println("Total: " + (endT - startT) + "ms");
 
