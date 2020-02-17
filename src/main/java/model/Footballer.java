@@ -74,6 +74,7 @@ public class Footballer implements Comparable<Footballer> {
 
     public void setOpponentList(List<Opponent> opponentList) {
         this.opponentList = opponentList;
+        difficultyTotal = getDifficultyTotal();
     }
 
     @Override
