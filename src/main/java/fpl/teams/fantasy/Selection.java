@@ -2,9 +2,9 @@ package fpl.teams.fantasy;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import data.model.Element;
+import data.model.Pick;
 import fpl.FantasyPLService;
-import json.Element;
-import json.Pick;
 import model.Footballer;
 import org.json.JSONArray;
 

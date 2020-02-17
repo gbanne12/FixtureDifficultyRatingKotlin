@@ -1,7 +1,7 @@
-import fpl.event.GameWeek;
-import model.Footballer;
-import fpl.teams.fantasy.Selection;
+import data.StaticRepository;
 import fpl.score.DifficultyRating;
+import fpl.teams.fantasy.Selection;
+import model.Footballer;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -12,7 +12,8 @@ public class Run {
     private static final int WEEKS_TO_EVALUATE = 5;
 
     public static void main(String[] args) throws IOException {
-        int week = new GameWeek().getCurrent();
+        long startT = System.currentTimeMillis();
+        int week = new StaticRepository().getCurrentWeek();
         Selection selection = new Selection(454545, week);
         List<Footballer> footballers = selection.get();
 
@@ -30,5 +31,8 @@ public class Run {
                             + "| Opponent: " + footballer.getOpponentList().toString()
                             + "| Total: " + footballer.getDifficultyTotal());
         }
+        long endT = System.currentTimeMillis();
+        System.out.println("Total: " + (endT - startT) + "ms");
+
     }
 }

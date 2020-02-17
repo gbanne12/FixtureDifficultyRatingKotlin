@@ -2,9 +2,9 @@ package fpl.score;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import data.model.Fixture;
+import data.model.Team;
 import fpl.FantasyPLService;
-import json.Fixture;
-import json.Team;
 import model.Footballer;
 import model.Opponent;
 import org.json.JSONArray;

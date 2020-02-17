@@ -1,4 +1,4 @@
-package json;
+package data.model;
 
 public class Element {
 
