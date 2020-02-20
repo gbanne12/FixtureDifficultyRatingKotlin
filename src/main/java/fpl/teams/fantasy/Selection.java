@@ -22,7 +22,7 @@ public class Selection {
     public Selection(int teamId, Repository repository) throws IOException {
         repo = repository;
         week = repo.getGameWeek();
-        JSONArray picks = repo.getPicks(week);
+        JSONArray picks = repo.getPicks(teamId, week);
         footballerList = getPopulatedFootballerList(picks);
     }
 

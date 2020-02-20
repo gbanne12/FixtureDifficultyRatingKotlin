@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class PicksDao {
 
-    public JSONArray getPicks(int gameWeek) throws IOException {
+    public JSONArray getPicks(int teamId, int gameWeek) throws IOException {
         FantasyPLService fplService = new FantasyPLService();
-        return fplService.getPicksArray(gameWeek);
+        return fplService.getPicksArray(teamId, gameWeek);
     }
 }

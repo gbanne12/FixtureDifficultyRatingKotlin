@@ -28,9 +28,9 @@ public class TransientRepository implements Repository {
     }
 
     @Override
-    public JSONArray getPicks(int gameWeek) throws IOException {
+    public JSONArray getPicks(int teamId, int gameWeek) throws IOException {
         if (picks.isEmpty()) {
-            picks = new PicksDao().getPicks(gameWeek - 1);
+            picks = new PicksDao().getPicks(teamId,gameWeek - 1);
         }
         return picks;
     }
