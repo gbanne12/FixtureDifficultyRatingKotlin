@@ -1,13 +1,11 @@
 package fpl.score;
 
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-import fpl.FantasyPLService;
-import json.Fixture;
-import json.Team;
+import data.Repository;
+import data.model.Fixture;
+import data.model.Team;
+import fpl.teams.fantasy.Selection;
 import model.Footballer;
 import model.Opponent;
-import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,24 +13,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DifficultyRating {
+public class DifficultyCalculator {
     private List<Team> teamList;
+    private Repository repo;
 
-    public DifficultyRating() throws IOException {
-        FantasyPLService fplService = new FantasyPLService();
-        JSONArray teamsArray = fplService.getTeamsArray();
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Team> teamsAdapter = moshi.adapter(Team.class);
-        teamList = new ArrayList<>();
-        for (int j = 0; j < teamsArray.length(); j++) {
-            teamList.add(teamsAdapter.fromJson(teamsArray.get(j).toString()));
-        }
+    public DifficultyCalculator(Repository repository) {
+        repo = repository;
     }
 
-    public List<Footballer> getOpponentDifficulty(List<Footballer> footballers, int gameWeek) throws IOException {
-        FantasyPLService fplService = new FantasyPLService();
-        JSONArray fixturesArray = fplService.getFixturesArray(gameWeek);
-        List<Fixture> fixtures = getFixturesList(fixturesArray);
+    public List<Footballer> difficultyRatingForWeeks(Selection selection, int weeksToCalculate) throws IOException {
+        List<Footballer> footballers = selection.get();
+        for (int i = 0; i < weeksToCalculate; i++) {
+            footballers = difficultyRating(selection, repo.getGameWeek() + i);
+        }
+        return footballers;
+    }
+
+    public List<Footballer> difficultyRating(Selection selection, int gameWeek) throws IOException {
+        List<Footballer> footballers = selection.get();
+        List<Fixture> fixtures = repo.getFixtures();
         List<Footballer> footballersWithFixture = new ArrayList<>();
 
         for (Fixture fixture : fixtures) {
@@ -41,15 +40,16 @@ public class DifficultyRating {
             int awayTeamId = fixture.team_a;
             int awayTeamFixtureDifficulty = fixture.team_a_difficulty;
 
-            List<Footballer> homeFootballers = filterFootballersByTeamId(footballers, homeTeamId);
+
+            List<Footballer> homeFootballers = filterByTeamId(footballers, homeTeamId);
             for (Footballer footballer : homeFootballers) {
-                footballer.setOpponentList(getOpponnentList(footballer, awayTeamId, homeTeamFixtureDifficulty));
+                footballer.setOpponentList(getOpponentList(footballer, awayTeamId, homeTeamFixtureDifficulty));
             }
             footballersWithFixture.addAll(homeFootballers);
 
-            List<Footballer> awayFootballers = filterFootballersByTeamId(footballers, awayTeamId);
+            List<Footballer> awayFootballers = filterByTeamId(footballers, awayTeamId);
             for (Footballer footballer : awayFootballers) {
-                footballer.setOpponentList(getOpponnentList(footballer, homeTeamId, awayTeamFixtureDifficulty));
+                footballer.setOpponentList(getOpponentList(footballer, homeTeamId, awayTeamFixtureDifficulty));
             }
             footballersWithFixture.addAll(awayFootballers);
         }
@@ -72,34 +72,24 @@ public class DifficultyRating {
         return footballers;
     }
 
-    private List<Footballer> filterFootballersByTeamId(List<Footballer> footballers, int teamId) {
+    private List<Footballer> filterByTeamId(List<Footballer> footballers, int teamId) {
         return footballers.stream()
                 .filter(x -> teamId == x.getTeamId())
                 .limit(3)
                 .collect(Collectors.toList());
     }
 
-    private List<Fixture> getFixturesList(JSONArray fixturesArray) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Fixture> fixturesAdapter = moshi.adapter(Fixture.class);
-        List<Fixture> fixtures = new ArrayList<>();
-        for (int i = 0; i < fixturesArray.length(); i++) {
-            Fixture fixture = fixturesAdapter.fromJson(fixturesArray.get(i).toString());
-            fixtures.add(fixture);
-        }
-        return fixtures;
-    }
-
-    private List<Opponent> getOpponnentList(Footballer footballer, int opponentId, int oppositionRating) throws IOException {
+    private List<Opponent> getOpponentList(Footballer footballer, int opponentId, int rating) throws IOException {
         Opponent opponent = new Opponent();
         opponent.setTeamId(opponentId);
+        teamList = repo.getTeams();
         for (Team team : teamList) {
             if (opponentId == team.id) {
                 opponent.setName(team.short_name);
             }
         }
         List<Opponent> opponentList = footballer.getOpponentList();
-        opponent.setDifficultyRating(oppositionRating);
+        opponent.setDifficultyRating(rating);
         opponentList.add(opponent);
         footballer.setOpponentList(opponentList);
         return opponentList;

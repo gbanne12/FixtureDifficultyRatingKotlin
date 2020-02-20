@@ -2,9 +2,9 @@ package fpl.teams.fantasy;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import fpl.FantasyPLService;
-import json.Element;
-import json.Pick;
+import data.Repository;
+import data.model.Element;
+import data.model.Pick;
 import model.Footballer;
 import org.json.JSONArray;
 
@@ -16,23 +16,18 @@ public class Selection {
 
     private int teamId;
     private int week;
+    private List<Footballer> footballerList;
+    private Repository repo;
 
-    public Selection(int teamId, int week) {
-        this.teamId = teamId;
-        this.week = week;
+    public Selection(int teamId, Repository repository) throws IOException {
+        repo = repository;
+        week = repo.getGameWeek();
+        JSONArray picks = repo.getPicks(week);
+        footballerList = getPopulatedFootballerList(picks);
     }
 
-    public List<Footballer> get() throws IOException {
-        long startTime = System.currentTimeMillis();
-        JSONArray picks = getPicks(week);
-        long endTime = System.currentTimeMillis();
-        System.out.println("Get Pick time " + (endTime - startTime));
-        return getPopulatedFootballerList(picks);
-    }
-
-    private JSONArray getPicks(int week) throws IOException {
-        FantasyPLService fplService = new FantasyPLService();
-        return fplService.getPicksArray(week);
+    public List<Footballer> get() {
+        return footballerList;
     }
 
     private List<Footballer> getPopulatedFootballerList(JSONArray picks) throws IOException {
@@ -51,7 +46,7 @@ public class Selection {
         }
 
         // add team id and footballer name
-        JSONArray elements = new FantasyPLService().getElementsArray();
+        JSONArray elements = repo.getElements();
         JsonAdapter<Element> elementsAdapter = moshi.adapter(Element.class);
 
         for (int j = 0; j < elements.length(); j++) {

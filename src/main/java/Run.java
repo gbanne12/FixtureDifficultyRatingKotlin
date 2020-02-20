@@ -1,7 +1,8 @@
-import fpl.event.GameWeek;
-import model.Footballer;
+import data.Repository;
+import data.TransientRepository;
+import fpl.score.DifficultyCalculator;
 import fpl.teams.fantasy.Selection;
-import fpl.score.DifficultyRating;
+import model.Footballer;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -12,23 +13,22 @@ public class Run {
     private static final int WEEKS_TO_EVALUATE = 5;
 
     public static void main(String[] args) throws IOException {
-        int week = new GameWeek().getCurrent();
-        Selection selection = new Selection(454545, week);
-        List<Footballer> footballers = selection.get();
+        long startT = System.currentTimeMillis();
 
-        for (int i = 0; i < WEEKS_TO_EVALUATE; i++) {
-            System.out.println("Week " + i);
-            DifficultyRating calculator = new DifficultyRating();
-            footballers = calculator.getOpponentDifficulty(footballers, week + i);
-        }
+        Repository repository = new TransientRepository();
+        Selection selection = new Selection(454545, repository);
+        DifficultyCalculator calculator = new DifficultyCalculator(repository);
+        List<Footballer> footballerList = calculator.difficultyRatingForWeeks(selection, WEEKS_TO_EVALUATE);
 
-        Collections.sort(footballers);
-        Collections.reverse(footballers);
-
-        for (Footballer footballer : footballers) {
+        Collections.sort(footballerList);
+        Collections.reverse(footballerList);
+        for (Footballer footballer : footballerList) {
             System.out.println("Player: " + footballer.getWebName()
-                            + "| Opponent: " + footballer.getOpponentList().toString()
-                            + "| Total: " + footballer.getDifficultyTotal());
+                    + "| Opponent: " + footballer.getOpponentList().toString()
+                    + "| Total: " + footballer.getDifficultyTotal());
         }
+
+        long endT = System.currentTimeMillis();
+        System.out.println("Total: " + (endT - startT) + "ms");
     }
 }
