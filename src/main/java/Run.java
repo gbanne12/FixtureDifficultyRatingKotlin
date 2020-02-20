@@ -1,5 +1,6 @@
-import data.StaticRepository;
-import fpl.score.DifficultyRating;
+import data.Repository;
+import data.TransientRepository;
+import fpl.score.DifficultyCalculator;
 import fpl.teams.fantasy.Selection;
 import model.Footballer;
 
@@ -14,11 +15,12 @@ public class Run {
     public static void main(String[] args) throws IOException {
         long startT = System.currentTimeMillis();
 
-        int week = new StaticRepository().getCurrentWeek();
-        Selection selection = new Selection(454545, week);
-        DifficultyRating calculator = new DifficultyRating();
-        List<Footballer> footballerList = calculator.getOpponentDifficulty(selection, week + 1, WEEKS_TO_EVALUATE);
+        Repository repository = new TransientRepository();
+        Selection selection = new Selection(454545, repository);
+        DifficultyCalculator calculator = new DifficultyCalculator(repository);
+        List<Footballer> footballerList = calculator.difficultyRatingForWeeks(selection, WEEKS_TO_EVALUATE);
 
+        Collections.sort(footballerList);
         Collections.reverse(footballerList);
         for (Footballer footballer : footballerList) {
             System.out.println("Player: " + footballer.getWebName()
@@ -28,6 +30,5 @@ public class Run {
 
         long endT = System.currentTimeMillis();
         System.out.println("Total: " + (endT - startT) + "ms");
-
     }
 }
