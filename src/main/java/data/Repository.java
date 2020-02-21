@@ -13,7 +13,7 @@ public interface Repository {
 
     JSONArray getElements() throws IOException;
 
-    List<Fixture> getFixtures() throws IOException;
+    List<Fixture> getFixtures(int gameWeek) throws IOException;
 
     List<Team> getTeams() throws IOException;
 

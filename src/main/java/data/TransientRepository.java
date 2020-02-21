@@ -36,9 +36,10 @@ public class TransientRepository implements Repository {
     }
 
     @Override
-    public List<Fixture> getFixtures() throws IOException{
-        if (fixtures.isEmpty()) {
-            fixtures = new FixturesDao().getAllFixtures(getGameWeek());
+    public List<Fixture> getFixtures(int gameWeek) throws IOException{
+        boolean isCurrentFixtureList = (gameWeek == getGameWeek() && !fixtures.isEmpty());
+        if (!isCurrentFixtureList) {
+            fixtures = new FixturesDao().getAllFixtures(gameWeek);
         }
         return fixtures;
     }
