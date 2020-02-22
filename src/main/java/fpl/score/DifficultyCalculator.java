@@ -8,21 +8,21 @@ import data.model.Team;
 import exception.NoFplResponseException;
 import fpl.selection.Selection;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DifficultyCalculator {
-    private List<Team> teamList;
+
     private Repository repo;
 
     public DifficultyCalculator(Repository repository) {
         repo = repository;
     }
 
-    public List<Footballer> difficultyRatingForWeeks(Selection selection, int weeksToCalculate) throws IOException {
+    public List<Footballer> difficultyRatingForWeeks(
+            Selection selection, int weeksToCalculate) throws NoFplResponseException {
         List<Footballer> footballers = selection.get();
         for (int i = 0; i < weeksToCalculate; i++) {
             footballers = difficultyRating(selection, repo.getGameWeek() + i);
@@ -30,7 +30,7 @@ public class DifficultyCalculator {
         return footballers;
     }
 
-    public List<Footballer> difficultyRating(Selection selection, int gameWeek) throws IOException {
+    public List<Footballer> difficultyRating(Selection selection, int gameWeek) throws NoFplResponseException {
         List<Footballer> footballers = selection.get();
         List<Fixture> fixtures = repo.getFixtures(gameWeek);
         List<Footballer> footballersWithFixture = new ArrayList<>();
@@ -80,7 +80,7 @@ public class DifficultyCalculator {
             Opponent opponent = new Opponent();
             opponent.setTeamId(opponentId);
             opponent.setDifficultyRating(rating);
-            teamList = repo.getTeams();
+            List<Team> teamList = repo.getTeams();
             for (Team team : teamList) {
                 if (opponentId == team.id) {
                     opponent.setName(team.short_name);
