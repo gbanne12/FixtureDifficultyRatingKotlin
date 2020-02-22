@@ -4,8 +4,8 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import data.Repository;
 import data.model.Element;
+import data.model.Footballer;
 import data.model.Pick;
-import model.Footballer;
 import org.json.JSONArray;
 
 import java.io.IOException;

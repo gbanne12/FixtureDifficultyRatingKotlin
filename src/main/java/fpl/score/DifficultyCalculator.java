@@ -2,10 +2,10 @@ package fpl.score;
 
 import data.Repository;
 import data.model.Fixture;
+import data.model.Footballer;
+import data.model.Opponent;
 import data.model.Team;
 import fpl.selection.Selection;
-import model.Footballer;
-import model.Opponent;
 
 import java.io.IOException;
 import java.util.ArrayList;

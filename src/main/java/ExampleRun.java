@@ -1,9 +1,9 @@
 import data.Repository;
 import data.TransientRepository;
+import data.model.Footballer;
 import exception.NoFplResponseException;
 import fpl.score.DifficultyCalculator;
 import fpl.selection.Selection;
-import model.Footballer;
 
 import java.io.IOException;
 import java.util.Collections;
