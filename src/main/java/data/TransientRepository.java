@@ -21,34 +21,45 @@ public class TransientRepository implements Repository {
 
     @Override
     public JSONArray getElements() throws IOException {
-        if (elements.isEmpty()) {
-            elements = new ElementsDao().getElements();
+        if (!elements.isEmpty()) {
+            return elements;
         }
+        elements = new ElementsDao().getElements();
         return elements;
     }
 
     @Override
     public JSONArray getPicks(int teamId, int gameWeek) throws IOException {
-        if (picks.isEmpty()) {
-            picks = new PicksDao().getPicks(teamId,gameWeek - 1);
+        if (!picks.isEmpty()) {
+            return picks;
         }
+        picks = new PicksDao().getPicks(teamId, gameWeek - 1);
         return picks;
     }
 
+    /**
+     * Get the fixtures for a given 'gameweek'
+     * Note: a gameweek is in no way tied to a calendar week
+     * @param gameWeek the 'week' number of the fixtures
+     * @return List of fixtures containing the home and away team IDs
+     * @throws IOException when response cannot be obtained from the endpoiint
+     */
     @Override
     public List<Fixture> getFixtures(int gameWeek) throws IOException{
-        boolean isCurrentFixtureList = (gameWeek == getGameWeek() && !fixtures.isEmpty());
-        if (!isCurrentFixtureList) {
-            fixtures = new FixturesDao().getAllFixtures(gameWeek);
+        boolean matchesCurrentFixtures = (gameWeek == getGameWeek() && !fixtures.isEmpty());
+        if (matchesCurrentFixtures) {
+            return fixtures;
         }
+        fixtures = new FixturesDao().getAllFixtures(gameWeek);
         return fixtures;
     }
 
     @Override
     public List<Team> getTeams() throws IOException {
-        if (teams.isEmpty()) {
-            teams = new TeamDao().getTeams();
+        if (!teams.isEmpty()) {
+            return teams;
         }
+        teams = new TeamDao().getTeams();
         return teams;
     }
 
@@ -61,9 +72,10 @@ public class TransientRepository implements Repository {
      */
     @Override
     public int getGameWeek() throws IOException {
-        if (week == 0) {
-            week = new EventDao().getCurrentWeek();
+        if (week > 0) {
+            return week;
         }
+        week = new EventDao().getCurrentWeek();
         return week;
     }
 }
