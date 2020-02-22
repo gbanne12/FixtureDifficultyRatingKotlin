@@ -23,15 +23,16 @@ public class DifficultyCalculator {
 
     public List<Footballer> difficultyRatingForWeeks(Selection selection, int weeksToCalculate) throws IOException {
         List<Footballer> footballers = selection.get();
+        int currentWeek = repo.getGameWeek();
         for (int i = 0; i < weeksToCalculate; i++) {
-            footballers = difficultyRating(selection, repo.getGameWeek() + i);
+            footballers = difficultyRating(selection, currentWeek + i);
         }
         return footballers;
     }
 
     public List<Footballer> difficultyRating(Selection selection, int gameWeek) throws IOException {
         List<Footballer> footballers = selection.get();
-        List<Fixture> fixtures = repo.getFixtures();
+        List<Fixture> fixtures = repo.getFixtures(gameWeek);
         List<Footballer> footballersWithFixture = new ArrayList<>();
 
         for (Fixture fixture : fixtures) {
