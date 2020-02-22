@@ -3,10 +3,13 @@ package data.model;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import exception.NoFplResponseException;
-import fpl.FantasyPLService;
+import fpl.url.FantasyEndpoint;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +17,8 @@ public class FixturesDao {
 
     public List<Fixture> getAllFixtures(int gameWeek) throws NoFplResponseException {
         try {
-            FantasyPLService fplService = new FantasyPLService();
-            JSONArray fixturesArray = fplService.getFixturesArray(gameWeek);
-
+            String url = IOUtils.toString(new URL(FantasyEndpoint.FIXTURES.url + (gameWeek)), StandardCharsets.UTF_8);
+            JSONArray fixturesArray = new JSONArray(url);
             Moshi moshi = new Moshi.Builder().build();
             JsonAdapter<Fixture> fixturesAdapter = moshi.adapter(Fixture.class);
             List<Fixture> fixtures = new ArrayList<>();
