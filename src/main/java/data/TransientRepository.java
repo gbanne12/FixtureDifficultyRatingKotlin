@@ -1,6 +1,7 @@
 package data;
 
 import data.model.*;
+import exception.NoFplResponseException;
 import org.json.JSONArray;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class TransientRepository implements Repository {
     private JSONArray elements = new JSONArray();
 
     @Override
-    public JSONArray getElements() throws IOException {
+    public JSONArray getElements() throws NoFplResponseException {
         if (!elements.isEmpty()) {
             return elements;
         }
@@ -29,7 +30,7 @@ public class TransientRepository implements Repository {
     }
 
     @Override
-    public JSONArray getPicks(int teamId, int gameWeek) throws IOException {
+    public JSONArray getPicks(int teamId, int gameWeek) throws NoFplResponseException {
         if (!picks.isEmpty()) {
             return picks;
         }
@@ -42,10 +43,10 @@ public class TransientRepository implements Repository {
      * Note: a gameweek is in no way tied to a calendar week
      * @param gameWeek the 'week' number of the fixtures
      * @return List of fixtures containing the home and away team IDs
-     * @throws IOException when response cannot be obtained from the endpoiint
+     * @throws IOException when response cannot be obtained from the endpoint
      */
     @Override
-    public List<Fixture> getFixtures(int gameWeek) throws IOException{
+    public List<Fixture> getFixtures(int gameWeek) throws NoFplResponseException {
         boolean matchesCurrentFixtures = (gameWeek == getGameWeek() && !fixtures.isEmpty());
         if (matchesCurrentFixtures) {
             return fixtures;
@@ -55,7 +56,7 @@ public class TransientRepository implements Repository {
     }
 
     @Override
-    public List<Team> getTeams() throws IOException {
+    public List<Team> getTeams() throws NoFplResponseException {
         if (!teams.isEmpty()) {
             return teams;
         }
@@ -71,7 +72,7 @@ public class TransientRepository implements Repository {
      * @throws IOException
      */
     @Override
-    public int getGameWeek() throws IOException {
+    public int getGameWeek() throws NoFplResponseException {
         if (week > 0) {
             return week;
         }
