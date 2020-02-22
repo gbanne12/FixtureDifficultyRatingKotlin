@@ -5,6 +5,7 @@ import data.model.Fixture;
 import data.model.Footballer;
 import data.model.Opponent;
 import data.model.Team;
+import exception.NoFplResponseException;
 import fpl.selection.Selection;
 
 import java.io.IOException;
@@ -23,9 +24,8 @@ public class DifficultyCalculator {
 
     public List<Footballer> difficultyRatingForWeeks(Selection selection, int weeksToCalculate) throws IOException {
         List<Footballer> footballers = selection.get();
-        int currentWeek = repo.getGameWeek();
         for (int i = 0; i < weeksToCalculate; i++) {
-            footballers = difficultyRating(selection, currentWeek + i);
+            footballers = difficultyRating(selection, repo.getGameWeek() + i);
         }
         return footballers;
     }
@@ -41,28 +41,57 @@ public class DifficultyCalculator {
             int awayTeamId = fixture.team_a;
             int awayTeamFixtureDifficulty = fixture.team_a_difficulty;
 
+            List<Footballer> homeFootballers = collectByTeamId(footballers, homeTeamId);
+            addOpponent(homeFootballers, awayTeamId, homeTeamFixtureDifficulty);
 
-            List<Footballer> homeFootballers = filterByTeamId(footballers, homeTeamId);
-            for (Footballer footballer : homeFootballers) {
-                footballer.setOpponentList(getOpponentList(footballer, awayTeamId, homeTeamFixtureDifficulty));
-            }
+            List<Footballer> awayFootballers = collectByTeamId(footballers, awayTeamId);
+            addOpponent(awayFootballers, homeTeamId, awayTeamFixtureDifficulty);
+
             footballersWithFixture.addAll(homeFootballers);
-
-            List<Footballer> awayFootballers = filterByTeamId(footballers, awayTeamId);
-            for (Footballer footballer : awayFootballers) {
-                footballer.setOpponentList(getOpponentList(footballer, homeTeamId, awayTeamFixtureDifficulty));
-            }
             footballersWithFixture.addAll(awayFootballers);
         }
 
-        Set<Integer> footballersWithFixtureIds = footballersWithFixture.stream()
+        List<Footballer> footballersWithNoFixture = collectWithoutFixture(footballers, footballersWithFixture);
+        addEmptyOpponent(footballersWithNoFixture);
+        return footballers;
+    }
+
+    private List<Footballer> collectByTeamId(List<Footballer> footballers, int teamId) {
+        return footballers.stream()
+                .filter(x -> teamId == x.getTeamId())
+                .limit(3)
+                .collect(Collectors.toList());
+    }
+
+    private List<Footballer> collectWithoutFixture(List<Footballer> footballers, List<Footballer> withFixture) {
+        Set<Integer> footballersWithFixtureIds = withFixture
+                .stream()
                 .map(Footballer::getId)
                 .collect(Collectors.toSet());
-        List<Footballer> footballersWithNoFixture = footballers.stream()
+
+        return footballers
+                .stream()
                 .filter(footballer -> !footballersWithFixtureIds.contains(footballer.getId()))
                 .collect(Collectors.toList());
+    }
 
-        for (Footballer footballer : footballersWithNoFixture) {
+    private void addOpponent(List<Footballer> footballers, int opponentId, int rating) throws NoFplResponseException {
+        for (Footballer footballer : footballers) {
+            Opponent opponent = new Opponent();
+            opponent.setTeamId(opponentId);
+            opponent.setDifficultyRating(rating);
+            teamList = repo.getTeams();
+            for (Team team : teamList) {
+                if (opponentId == team.id) {
+                    opponent.setName(team.short_name);
+                }
+            }
+            footballer.getOpponentList().add(opponent);
+        }
+    }
+
+    private void addEmptyOpponent(List<Footballer> footballers) {
+        for (Footballer footballer : footballers) {
             Opponent opponent = new Opponent();
             opponent.setName("NOT PLAYING");
             opponent.setDifficultyRating(0);
@@ -70,29 +99,5 @@ public class DifficultyCalculator {
             opponentList.add(opponent);
             footballer.setOpponentList(opponentList);
         }
-        return footballers;
-    }
-
-    private List<Footballer> filterByTeamId(List<Footballer> footballers, int teamId) {
-        return footballers.stream()
-                .filter(x -> teamId == x.getTeamId())
-                .limit(3)
-                .collect(Collectors.toList());
-    }
-
-    private List<Opponent> getOpponentList(Footballer footballer, int opponentId, int rating) throws IOException {
-        Opponent opponent = new Opponent();
-        opponent.setTeamId(opponentId);
-        teamList = repo.getTeams();
-        for (Team team : teamList) {
-            if (opponentId == team.id) {
-                opponent.setName(team.short_name);
-            }
-        }
-        List<Opponent> opponentList = footballer.getOpponentList();
-        opponent.setDifficultyRating(rating);
-        opponentList.add(opponent);
-        footballer.setOpponentList(opponentList);
-        return opponentList;
     }
 }
