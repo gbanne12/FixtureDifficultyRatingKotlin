@@ -1,4 +1,4 @@
-package fpl.teams.fantasy;
+package fpl.selection;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;

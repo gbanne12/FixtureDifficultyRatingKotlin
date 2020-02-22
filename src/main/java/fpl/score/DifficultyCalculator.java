@@ -3,7 +3,7 @@ package fpl.score;
 import data.Repository;
 import data.model.Fixture;
 import data.model.Team;
-import fpl.teams.fantasy.Selection;
+import fpl.selection.Selection;
 import model.Footballer;
 import model.Opponent;
 

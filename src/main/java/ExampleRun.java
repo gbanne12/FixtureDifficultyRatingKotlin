@@ -2,7 +2,7 @@ import data.Repository;
 import data.TransientRepository;
 import exception.NoFplResponseException;
 import fpl.score.DifficultyCalculator;
-import fpl.teams.fantasy.Selection;
+import fpl.selection.Selection;
 import model.Footballer;
 
 import java.io.IOException;
