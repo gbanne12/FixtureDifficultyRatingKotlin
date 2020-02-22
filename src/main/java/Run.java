@@ -11,12 +11,13 @@ import java.util.List;
 public class Run {
 
     private static final int WEEKS_TO_EVALUATE = 5;
+    private static int MANAGER_ID = 2029893;
 
     public static void main(String[] args) throws IOException {
         long startT = System.currentTimeMillis();
 
         Repository repository = new TransientRepository();
-        Selection selection = new Selection(454545, repository);
+        Selection selection = new Selection(MANAGER_ID, repository);
         DifficultyCalculator calculator = new DifficultyCalculator(repository);
         List<Footballer> footballerList = calculator.difficultyRatingForWeeks(selection, WEEKS_TO_EVALUATE);
 

@@ -1,9 +1,9 @@
 package fpl;
 
+import fpl.url.FantasyEndpoint;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import fpl.url.FantasyEndpoint;
 
 import java.io.IOException;
 import java.net.URL;
@@ -53,8 +53,9 @@ public class FantasyPLService {
      * @return picks array detailing the footballers selected for a manager id
      * @throws IOException
      */
-    public JSONArray getPicksArray(int week) throws IOException {
-        JSONObject picksJson = getJsonObject(FantasyEndpoint.PICKS_PREFIX.url + week + FantasyEndpoint.PICKS_SUFFIX.url);
+    public JSONArray getPicksArray(int teamId, int week) throws IOException {
+        JSONObject picksJson = getJsonObject(
+                FantasyEndpoint.PICKS_PREFIX.url + teamId + FantasyEndpoint.PICKS_INFIX.url + week + FantasyEndpoint.PICKS_SUFFIX.url);
         return picksJson.getJSONArray("picks");
     }
 

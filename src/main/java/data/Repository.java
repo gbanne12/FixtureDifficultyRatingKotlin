@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface Repository {
 
-    JSONArray getPicks(int gameWeek) throws IOException;
+    JSONArray getPicks(int teamId, int gameWeek) throws IOException;
 
     JSONArray getElements() throws IOException;
 

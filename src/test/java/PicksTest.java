@@ -23,7 +23,7 @@ public class PicksTest {
 
     @Test
     public void canGetElementIdForCurrentSelctions() {
-      /*  JSONArray jsonArray = json.getJSONArray("pick");
+      /*  JSONArray jsonArray = data.getJSONArray("pick");
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<Pick> jsonAdapter = moshi.adapter(Pick.class);*/
     }
