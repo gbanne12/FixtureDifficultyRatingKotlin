@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Selection {
 
@@ -59,6 +61,25 @@ public class Selection {
             }
         }
         return footballerList;
+    }
+
+    public List<Footballer> collectByTeamId(int teamId) {
+        return footballerList.stream()
+                .filter(x -> teamId == x.getTeamId())
+                .limit(3)
+                .collect(Collectors.toList());
+    }
+
+    public List<Footballer> collectInverse(List<Footballer> toInvert) {
+        Set<Integer> existingIds = toInvert
+                .stream()
+                .map(Footballer::getId)
+                .collect(Collectors.toSet());
+
+        return footballerList
+                .stream()
+                .filter(footballer -> !existingIds.contains(footballer.getId()))
+                .collect(Collectors.toList());
     }
 
 }
