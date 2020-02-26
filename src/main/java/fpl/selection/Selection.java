@@ -21,15 +21,20 @@ public class Selection {
     private List<Footballer> footballerList;
     private Repository repo;
 
-    public Selection(int teamId, Repository repository) throws IOException {
+    public Selection(Repository repository) throws IOException {
         repo = repository;
         week = repo.getGameWeek();
-        JSONArray picks = repo.getPicks(teamId, week);
-        footballerList = getPopulatedFootballerList(picks);
     }
 
-    public List<Footballer> get() {
-        return footballerList;
+    public List<Footballer> getList(int teamId) throws IOException {
+        if (this.teamId == teamId) {
+            return footballerList;
+        } else {
+            this.teamId = teamId;
+            JSONArray picks = repo.getPicks(teamId, week);
+            footballerList = getPopulatedFootballerList(picks);
+            return footballerList;
+        }
     }
 
     private List<Footballer> getPopulatedFootballerList(JSONArray picks) throws IOException {
