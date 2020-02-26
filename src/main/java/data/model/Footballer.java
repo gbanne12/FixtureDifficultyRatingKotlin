@@ -40,12 +40,11 @@ public class Footballer implements Comparable<Footballer> {
     }
 
     public int getDifficultyTotal() {
-        int numberOfOpponnents = opponentList.size();
-        int difficultyTotal = 0;
-        for (int i = 0; i < numberOfOpponnents; i++) {
-            difficultyTotal += opponentList.get(i).getDifficultyRating();
+        int total = 0;
+        for (Opponent opponent : opponentList) {
+            total += opponent.getDifficultyRating();
         }
-        return difficultyTotal;
+        return total;
     }
 
     public void setDifficultyTotal(int difficultyTotal) {
@@ -74,11 +73,10 @@ public class Footballer implements Comparable<Footballer> {
 
     public void setOpponentList(List<Opponent> opponentList) {
         this.opponentList = opponentList;
-        difficultyTotal = getDifficultyTotal();
     }
 
     @Override
     public int compareTo(Footballer footballer) {
-        return Integer.compare(difficultyTotal, footballer.difficultyTotal);
+        return Integer.compare(getDifficultyTotal(), footballer.getDifficultyTotal());
     }
 }

@@ -2,7 +2,7 @@ import data.Repository;
 import data.TransientRepository;
 import data.model.Footballer;
 import exception.NoFplResponseException;
-import fpl.score.DifficultyCalculator;
+import fpl.score.FixtureCalculator;
 import fpl.selection.Selection;
 
 import java.io.IOException;
@@ -19,16 +19,18 @@ public class ExampleRun {
 
         try {
             Repository repository = new TransientRepository();
-            Selection selection = new Selection(MANAGER_ID, repository);
-            DifficultyCalculator calculator = new DifficultyCalculator(repository);
-            List<Footballer> footballerList = calculator.difficultyRatingForWeeks(selection, WEEKS_TO_EVALUATE);
+            Selection selection = new Selection(repository);
+            List<Footballer> footballers = selection.getList(MANAGER_ID);
 
-            Collections.sort(footballerList);
-            Collections.reverse(footballerList);
-            for (Footballer footballer : footballerList) {
-                System.out.println("Player: " + footballer.getWebName()
-                        + "| Opponent: " + footballer.getOpponentList().toString()
-                        + "| Total: " + footballer.getDifficultyTotal());
+            FixtureCalculator calculator = new FixtureCalculator(repository);
+            calculator.addOppositionForWeeks(selection, WEEKS_TO_EVALUATE);
+
+            Collections.sort(footballers);
+            Collections.reverse(footballers);
+            for (Footballer footballer : footballers) {
+                System.out.println("Player: " + footballer.getWebName() +
+                                "| Opponent: " + footballer.getOpponentList().toString() +
+                                "| Total: " + footballer.getDifficultyTotal());
             }
 
         } catch (NoFplResponseException e) {
