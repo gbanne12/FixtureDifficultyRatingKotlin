@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FixturesDao {
 
-    public List<Fixture> getAllFixtures(int gameWeek) throws NoFplResponseException {
+    public List<Fixture> getAll(int gameWeek) throws NoFplResponseException {
         try {
             String url = IOUtils.toString(new URL(FantasyEndpoint.FIXTURES.url + (gameWeek)), StandardCharsets.UTF_8);
             JSONArray fixturesArray = new JSONArray(url);

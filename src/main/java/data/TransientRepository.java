@@ -17,25 +17,35 @@ public class TransientRepository implements Repository {
     private int week;
     private List<Fixture> fixtures = new ArrayList<>();
     private List<Team> teams = new ArrayList<>();
-    private JSONArray picks = new JSONArray();
-    private JSONArray elements = new JSONArray();
+    private List<Footballer> footballers = new ArrayList<>();
+    private List<Element> elements = new ArrayList<>();
 
     @Override
-    public JSONArray getElements() throws NoFplResponseException {
+    public List<Element> getElements() throws NoFplResponseException {
         if (!elements.isEmpty()) {
             return elements;
         }
-        elements = new ElementsDao().getElements();
+        elements = new ElementsDao().getAll();
         return elements;
     }
 
     @Override
-    public JSONArray getPicks(int teamId, int gameWeek) throws NoFplResponseException {
-        if (!picks.isEmpty()) {
-            return picks;
+    public List<Footballer> getFootballers(int managerId, int gameWeek) throws IOException {
+        if (!footballers.isEmpty()) {
+            return footballers;
         }
-        picks = new PicksDao().getPicks(teamId, gameWeek - 1);
-        return picks;
+        JSONArray picks = new PicksDao().getPicks(managerId, gameWeek - 1);
+        footballers = new FootballerDao().getAll(picks);
+        List<Element> elements = getElements();
+        for (Element e : elements) {
+            for (Footballer f : footballers) {
+                if (e != null && e.id == f.getId()) {
+                    f.setTeamId(e.team);
+                    f.setWebName(e.web_name);
+                }
+            }
+        }
+        return footballers;
     }
 
     /**
@@ -51,7 +61,7 @@ public class TransientRepository implements Repository {
         if (matchesCurrentFixtures) {
             return fixtures;
         }
-        fixtures = new FixturesDao().getAllFixtures(gameWeek);
+        fixtures = new FixturesDao().getAll(gameWeek);
         return fixtures;
     }
 

@@ -1,13 +1,10 @@
 package fpl.score;
 
 import data.Repository;
-import data.model.Fixture;
-import data.model.Footballer;
-import data.model.Opponent;
-import data.model.Team;
+import data.model.*;
 import exception.NoFplResponseException;
-import fpl.selection.Selection;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,15 +16,18 @@ public class FixtureCalculator {
         repo = repository;
     }
 
-    public void addOppositionForWeeks(Selection selection, int weeksToCalculate) throws NoFplResponseException {
+    public List<Footballer> getFixturesDifficulty(int managerId, int weeksToCalculate) throws IOException {
+        List<Footballer> footballers = repo.getFootballers(managerId, repo.getGameWeek());
         for (int i = 0; i < weeksToCalculate; i++) {
-            addOpposition(selection, repo.getGameWeek() + i);
+            updateOpposition(footballers, repo.getGameWeek() + i);
         }
+        return footballers;
     }
 
-    public void addOpposition(Selection selection, int gameWeek) throws NoFplResponseException {
-        List<Fixture> gameWeekFixtures = repo.getFixtures(gameWeek);
+    public void updateOpposition(List<Footballer> footballers, int gameWeek) throws IOException {
         List<Footballer> playingFootballers = new ArrayList<>();
+        List<Fixture> gameWeekFixtures = repo.getFixtures(gameWeek);
+        FootballerDao footballerDao = new FootballerDao();
 
         for (Fixture fixture : gameWeekFixtures) {
             int homeTeamId = fixture.team_h;
@@ -35,22 +35,28 @@ public class FixtureCalculator {
             int awayTeamId = fixture.team_a;
             int awayTeamFixtureDifficulty = fixture.team_a_difficulty;
 
-            List<Footballer> homeFootballers = selection.collectByTeamId(homeTeamId);
-            addOpposition(homeFootballers, awayTeamId, homeTeamFixtureDifficulty);
 
-            List<Footballer> awayFootballers = selection.collectByTeamId(awayTeamId);
-            addOpposition(awayFootballers, homeTeamId, awayTeamFixtureDifficulty);
+            List<Footballer> homeFootballers = footballerDao.getByTeamId(footballers, homeTeamId);
+            for (Footballer f : homeFootballers) {
+                footballerDao.update(footballers, f.getId(), buildOpponent(awayTeamId, homeTeamFixtureDifficulty));
+            }
+
+            List<Footballer> awayFootballers = footballerDao.getByTeamId(footballers, awayTeamId);
+            for (Footballer f : awayFootballers) {
+                footballerDao.update(footballers, f.getId(), buildOpponent(homeTeamId, awayTeamFixtureDifficulty));
+            }
 
             playingFootballers.addAll(homeFootballers);
             playingFootballers.addAll(awayFootballers);
         }
 
-        List<Footballer> nonPlayingFootballers = selection.collectInverse(playingFootballers);
-        addOpposition(nonPlayingFootballers, -1, 0);
+        List<Footballer> nonPlayingFootballers = footballerDao.getInverse(footballers, playingFootballers);
+        for (Footballer f : nonPlayingFootballers) {
+            footballerDao.update(footballers, f.getId(), buildOpponent(-1, 0));
+        }
     }
 
-    private void addOpposition(List<Footballer> footballers, int oppositionId, int difficultyRating)
-            throws NoFplResponseException{
+    private Opponent buildOpponent(int oppositionId, int difficultyRating) throws NoFplResponseException {
         Opponent opponent = new Opponent();
         opponent.setDifficultyRating(difficultyRating);
 
@@ -65,9 +71,6 @@ public class FixtureCalculator {
                 }
             }
         }
-
-        for (Footballer footballer : footballers) {
-            footballer.getOpponentList().add(opponent);
-        }
+        return opponent;
     }
 }

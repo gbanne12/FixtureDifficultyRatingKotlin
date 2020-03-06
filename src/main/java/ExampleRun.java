@@ -3,7 +3,6 @@ import data.TransientRepository;
 import data.model.Footballer;
 import exception.NoFplResponseException;
 import fpl.score.FixtureCalculator;
-import fpl.selection.Selection;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -19,11 +18,8 @@ public class ExampleRun {
 
         try {
             Repository repository = new TransientRepository();
-            Selection selection = new Selection(repository);
-            List<Footballer> footballers = selection.getList(MANAGER_ID);
-
             FixtureCalculator calculator = new FixtureCalculator(repository);
-            calculator.addOppositionForWeeks(selection, WEEKS_TO_EVALUATE);
+            List<Footballer> footballers = calculator.getFixturesDifficulty(MANAGER_ID, WEEKS_TO_EVALUATE);
 
             Collections.sort(footballers);
             Collections.reverse(footballers);
