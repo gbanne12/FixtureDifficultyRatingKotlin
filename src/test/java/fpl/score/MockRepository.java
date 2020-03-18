@@ -12,13 +12,18 @@ import java.util.List;
 
 /**
  * Set up test data for 6 footballers.
- * Footballers in team 2: 1 & 2
- * Footballers in team 3: 3
- * Footballers in team 4: 6
- * Footballers in team 5: 4
- * Footballers in team 20: 5
- * <p>
- * Fixtures 2 plays 3, 20 plays 5
+ * Team 2 = footballers 1 & 2
+ * Team 3 = footballer 3
+ * Team 4 = footballer 6
+ * Team 5 = footballer 4
+ * Team 6 = footballer 7
+ * Team 20 = footballer 5
+ *
+ * ---------
+ * Fixtures
+ * Team 2 plays 3,
+ * Team 2 plays 6,
+ * Team 20 plays 5,
  * Team 4 does not play.
  */
 public class MockRepository implements Repository {
@@ -56,6 +61,12 @@ public class MockRepository implements Repository {
         six.setPosition(6);
         footballers.add(six);
 
+        Footballer seven = new Footballer();
+        seven.setId(7);
+        seven.setPosition(7);
+        footballers.add(seven);
+
+        //Fixme: Logic copied from transient repo should be tested separately
         List<Element> elements = getElements();
         for (Element e : elements) {
             for (Footballer f : footballers) {
@@ -69,14 +80,15 @@ public class MockRepository implements Repository {
     }
 
     @Override
-    public List<Element> getElements() throws NoFplResponseException {
+    public List<Element> getElements() {
         List<Element> elements = new ArrayList<>();
         elements.add(new Element(1, 2, "Element One"));
         elements.add(new Element(2, 2, "Element Two"));
         elements.add(new Element(3, 3, "Element Three"));
         elements.add(new Element(4, 5, "Element Four"));
+        elements.add(new Element(5, 20, "Element Five"));
         elements.add(new Element(6, 4, "Element Six"));
-        elements.add(new Element(5, 20, "Element Twenty"));
+        elements.add(new Element(7, 6, "Element Seven"));
         return elements;
     }
 
@@ -84,6 +96,7 @@ public class MockRepository implements Repository {
     public List<Fixture> getFixtures(int gameWeek) {
         List<Fixture> fixtures = new ArrayList<>();
         fixtures.add(new Fixture(2, 5, 3, 3));
+        fixtures.add(new Fixture(2, 1, 6, 2));
         fixtures.add(new Fixture(20, 2, 5, 4));
         return fixtures;
     }
@@ -95,6 +108,7 @@ public class MockRepository implements Repository {
         teams.add(new Team(3, "THR", "Three"));
         teams.add(new Team(4, "FOU", "Four"));
         teams.add(new Team(5, "FIV", "Five"));
+        teams.add(new Team(6, "SIX", "Six"));
         teams.add(new Team(20, "TWE", "Twenty"));
         return teams;
     }

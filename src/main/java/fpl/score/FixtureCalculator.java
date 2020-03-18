@@ -62,6 +62,7 @@ public class FixtureCalculator {
 
         if (oppositionId == -1) {
             opponent.setName("NO FIXTURE");
+            opponent.setTeamId(0);
         } else {
             opponent.setTeamId(oppositionId);
             List<Team> teamList = repo.getTeams();

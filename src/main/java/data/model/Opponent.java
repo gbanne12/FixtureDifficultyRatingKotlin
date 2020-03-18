@@ -35,4 +35,13 @@ public class Opponent {
     public String toString() {
         return "team: " + name + " | difficulty: " + difficultyRating;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Opponent opponent = (Opponent) o;
+        return (opponent.getTeamId() == getTeamId() &&
+                opponent.getName().equals(getName()) &&
+                opponent.getDifficultyRating() == getDifficultyRating());
+    }
+
 }
