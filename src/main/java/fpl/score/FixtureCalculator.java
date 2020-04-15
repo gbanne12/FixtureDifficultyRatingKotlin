@@ -26,24 +26,23 @@ public class FixtureCalculator {
 
     public void updateOpposition(List<Footballer> footballers, int gameWeek) throws IOException {
         List<Footballer> playingFootballers = new ArrayList<>();
-        List<Fixture> gameWeekFixtures = repo.getFixtures(gameWeek);
-        FootballerDao footballerDao = new FootballerDao();
+        FootballerDaoImpl footballerDao = new FootballerDaoImpl();
 
+        List<Fixture> gameWeekFixtures = repo.getFixtures(gameWeek);
         for (Fixture fixture : gameWeekFixtures) {
             int homeTeamId = fixture.team_h;
             int homeTeamFixtureDifficulty = fixture.team_h_difficulty;
             int awayTeamId = fixture.team_a;
             int awayTeamFixtureDifficulty = fixture.team_a_difficulty;
 
-
             List<Footballer> homeFootballers = footballerDao.getByTeamId(footballers, homeTeamId);
             for (Footballer f : homeFootballers) {
-                footballerDao.update(footballers, f.getId(), buildOpponent(awayTeamId, homeTeamFixtureDifficulty));
+                footballerDao.update(homeFootballers, f.getId(), buildOpponent(awayTeamId, homeTeamFixtureDifficulty));
             }
 
             List<Footballer> awayFootballers = footballerDao.getByTeamId(footballers, awayTeamId);
             for (Footballer f : awayFootballers) {
-                footballerDao.update(footballers, f.getId(), buildOpponent(homeTeamId, awayTeamFixtureDifficulty));
+                footballerDao.update(awayFootballers, f.getId(), buildOpponent(homeTeamId, awayTeamFixtureDifficulty));
             }
 
             playingFootballers.addAll(homeFootballers);
@@ -52,7 +51,7 @@ public class FixtureCalculator {
 
         List<Footballer> nonPlayingFootballers = footballerDao.getInverse(footballers, playingFootballers);
         for (Footballer f : nonPlayingFootballers) {
-            footballerDao.update(footballers, f.getId(), buildOpponent(-1, 0));
+            footballerDao.update(nonPlayingFootballers, f.getId(), buildOpponent(-1, 0));
         }
     }
 

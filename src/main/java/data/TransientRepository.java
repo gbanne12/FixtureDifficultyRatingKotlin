@@ -2,7 +2,6 @@ package data;
 
 import data.model.*;
 import exception.NoFplResponseException;
-import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,8 +33,7 @@ public class TransientRepository implements Repository {
         if (!footballers.isEmpty()) {
             return footballers;
         }
-        JSONArray picks = new PicksDao().getPicks(managerId, gameWeek - 1);
-        footballers = new FootballerDao().getAll(picks);
+        footballers = new FootballerDaoImpl().getAll(managerId, gameWeek);
         List<Element> elements = getElements();
         for (Element e : elements) {
             for (Footballer f : footballers) {
