@@ -17,7 +17,7 @@ public class FixtureCalculator {
     }
 
     public List<Footballer> getFixturesDifficulty(int managerId, int weeksToCalculate) throws IOException {
-        List<Footballer> footballers = repo.getFootballers(managerId, repo.getGameWeek());
+        List<Footballer> footballers = repo.getFootballers(managerId, repo.getGameWeek() - 1);
         for (int i = 0; i < weeksToCalculate; i++) {
             updateOpposition(footballers, repo.getGameWeek() + i);
         }
@@ -30,10 +30,10 @@ public class FixtureCalculator {
 
         List<Fixture> gameWeekFixtures = repo.getFixtures(gameWeek);
         for (Fixture fixture : gameWeekFixtures) {
-            int homeTeamId = fixture.team_h;
-            int homeTeamFixtureDifficulty = fixture.team_h_difficulty;
-            int awayTeamId = fixture.team_a;
-            int awayTeamFixtureDifficulty = fixture.team_a_difficulty;
+            int homeTeamId = fixture.getTeam_h();
+            int homeTeamFixtureDifficulty = fixture.getTeam_h_difficulty();
+            int awayTeamId = fixture.getTeam_a();
+            int awayTeamFixtureDifficulty = fixture.getTeam_a_difficulty();
 
             List<Footballer> homeFootballers = footballerDao.getByTeamId(footballers, homeTeamId);
             for (Footballer f : homeFootballers) {
@@ -66,8 +66,8 @@ public class FixtureCalculator {
             opponent.setTeamId(oppositionId);
             List<Team> teamList = repo.getTeams();
             for (Team team : teamList) {
-                if (oppositionId == team.id) {
-                    opponent.setName(team.short_name);
+                if (oppositionId == team.getId()) {
+                    opponent.setName(team.getShort_name());
                 }
             }
         }
