@@ -2,9 +2,8 @@ package data
 
 import data.model.*
 import exception.NoFplResponseException
-
 import java.io.IOException
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Repository for data retrieved directly from the FPL endpoints
@@ -13,7 +12,7 @@ import java.util.ArrayList
 class TransientRepository : Repository {
 
     private var week: Int = 0
-    private var footballers: List<Footballer> = ArrayList()
+    private var footballers: MutableList<Footballer> = ArrayList()
     private var elements: List<Element> = ArrayList()
     private var fixtures: List<Fixture> = ArrayList()
     private var teams: List<Team> = ArrayList()
@@ -28,12 +27,12 @@ class TransientRepository : Repository {
     }
 
     @Throws(NoFplResponseException::class)
-    override fun getFootballers(teamId: Int, gameWeek: Int): List<Footballer> {
+    override fun getFootballers(teamId: Int, gameWeek: Int): MutableList<Footballer> {
         if (!footballers.isEmpty()) {
             return footballers
         }
         footballers = FootballerDaoImpl().getAll(teamId, gameWeek)
-        var elements: List<Element> = getElements()
+        val elements: List<Element> = getElements()
         for(element in elements) {
             for (footballer in footballers) {
                 if (element.id == footballer.id) {

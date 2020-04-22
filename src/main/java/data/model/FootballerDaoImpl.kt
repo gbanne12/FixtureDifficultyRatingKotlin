@@ -9,14 +9,12 @@ import java.util.stream.Collectors
 class FootballerDaoImpl : FootballerDao {
 
     @Throws(IOException::class)
-    override fun getAll(managerId: Int, gameWeek: Int): List<Footballer> {
-        val picks = PicksDao().getPicks(managerId, gameWeek)
-        val moshi = Moshi.Builder().build()
-        val picksAdapter = moshi.adapter(Pick::class.java)
-
+    override fun getAll(managerId: Int, gameWeek: Int): MutableList<Footballer> {
+        val pickAdapter = Moshi.Builder().build().adapter(Pick::class.java)
+        val pickArray = PickDao().getPicks(managerId, gameWeek)
         val footballers = ArrayList<Footballer>()
-        for (i in 0 until picks.length()) {
-            val pick = picksAdapter.fromJson(picks.get(i).toString())
+        for (i in 0 until pickArray.length()) {
+            val pick = pickAdapter.fromJson(pickArray.get(i).toString())
             if (pick != null) {
                 val footballer = Footballer()
                 footballer.id = pick.element

@@ -18,7 +18,7 @@ interface Repository {
     fun getGameWeek(): Int
 
     @Throws(NoFplResponseException::class)
-    fun getFootballers(teamId: Int, gameWeek: Int): List<Footballer>
+    fun getFootballers(teamId: Int, gameWeek: Int): MutableList<Footballer>
 
     @Throws(NoFplResponseException::class)
     fun getFixtures(gameWeek: Int): List<Fixture>
