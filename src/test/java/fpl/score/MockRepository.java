@@ -70,9 +70,9 @@ public class MockRepository implements Repository {
         List<Element> elements = getElements();
         for (Element e : elements) {
             for (Footballer f : footballers) {
-                if (e != null && e.id == f.getId()) {
-                    f.setTeamId(e.team);
-                    f.setWebName(e.web_name);
+                if (e != null && e.getId() == f.getId()) {
+                    f.setTeamId(e.getTeam());
+                    f.setWebName(e.getWeb_name());
                 }
             }
         }
@@ -104,12 +104,12 @@ public class MockRepository implements Repository {
     @Override
     public List<Team> getTeams() {
         List<Team> teams = new ArrayList<>();
-        teams.add(new Team(2, "TWO", "Two"));
-        teams.add(new Team(3, "THR", "Three"));
-        teams.add(new Team(4, "FOU", "Four"));
-        teams.add(new Team(5, "FIV", "Five"));
-        teams.add(new Team(6, "SIX", "Six"));
-        teams.add(new Team(20, "TWE", "Twenty"));
+        teams.add(new Team(2, "Two"));
+        teams.add(new Team(3,"Three"));
+        teams.add(new Team(4,"Four"));
+        teams.add(new Team(5,"Five"));
+        teams.add(new Team(6,"Six"));
+        teams.add(new Team(20, "Twenty"));
         return teams;
     }
 

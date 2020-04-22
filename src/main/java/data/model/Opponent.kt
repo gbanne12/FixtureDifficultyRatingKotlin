@@ -9,4 +9,14 @@ class Opponent {
     override fun toString(): String {
         return "team: $name | difficulty: $difficultyRating"
     }
+
+    override fun equals(any: Any?): Boolean {
+        val opponent = any as Opponent?
+        if (opponent != null) {
+            return opponent.teamId == teamId &&
+                    opponent.name == name &&
+                    opponent.difficultyRating == difficultyRating
+        }
+        return false
+    }
 }

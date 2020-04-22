@@ -67,12 +67,12 @@ public class FixtureCalculatorTest {
         Footballer one = footballers.get(0);
 
         Opponent firstOpponentForTeam2 = new Opponent();
-        firstOpponentForTeam2.setName("THR");
+        firstOpponentForTeam2.setName("Three");
         firstOpponentForTeam2.setTeamId(3);
         firstOpponentForTeam2.setDifficultyRating(5);
 
         Opponent secondOpponentForTeam2 = new Opponent();
-        secondOpponentForTeam2.setName("SIX");
+        secondOpponentForTeam2.setName("Six");
         secondOpponentForTeam2.setTeamId(6);
         secondOpponentForTeam2.setDifficultyRating(1);
 
@@ -85,7 +85,7 @@ public class FixtureCalculatorTest {
         Footballer three = footballers.get(2);
 
         Opponent opponentForTeam3 = new Opponent();
-        opponentForTeam3.setName("TWO");
+        opponentForTeam3.setName("Two");
         opponentForTeam3.setTeamId(2);
         opponentForTeam3.setDifficultyRating(3);
 
